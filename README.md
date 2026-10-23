@@ -12,7 +12,7 @@ This is the free edition; the **Plus** features above come with a Patreon member
 ## Install
 Foundry → *Add-on Modules* → *Install Module* → Manifest URL:
 ```
-https://github.com/Rutz179/rutz-crit-cutin/releases/latest/download/module.json
+https://github.com/RestInLOV3/rutz-crit-cutin/releases/latest/download/module.json
 ```
 Foundry VTT v13–v14 · Any system · English / 한국어
 
