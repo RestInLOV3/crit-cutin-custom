@@ -73,7 +73,7 @@ export function stageLook(key) {
   const base = game.actors.get(e.actor);
   const actor = tok?.actor ?? base;
   const cfg = actor?.getFlag?.(MODULE_ID, STAGE_FLAG) ?? base?.getFlag?.(MODULE_ID, STAGE_FLAG) ?? {};
-  const hudFaces = actor?.getFlag?.("pf2e-kr-hud", "faces") ?? [];
+  const hudFaces = actor?.flags?.["pf2e-kr-hud"]?.faces ?? [];
   const faces = (Array.isArray(cfg.faces) && cfg.faces.length ? cfg.faces : hudFaces).filter(f => f?.key && f?.img);
   const portrait = actor?.img && !PLACEHOLDER.test(actor.img) ? actor.img : null;
   const tokenImg = tok ? ((tok.ring?.enabled && tok.ring?.subject?.texture) || tok.texture?.src) : actor?.prototypeToken?.texture?.src;

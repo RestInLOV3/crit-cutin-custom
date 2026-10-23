@@ -282,7 +282,7 @@ export class Stage {
   noteLine(key, message) {
     if (!key || !stageActive()) return;
     const text = dialogueOf(message);
-    const face = message.getFlag?.(MODULE_ID, "face") ?? message.getFlag?.("pf2e-kr-hud", "face");
+    const face = message.getFlag?.(MODULE_ID, "face") ?? message.flags?.["pf2e-kr-hud"]?.face;
     if (!text && !face?.key) return;              // rolls and cards don't bring anyone on stage
     key = this._canon(key);
     const now = Date.now();

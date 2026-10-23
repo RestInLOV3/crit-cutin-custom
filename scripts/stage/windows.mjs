@@ -189,7 +189,7 @@ export class StageLookWindow extends AppV2 {
     super({ id: `rcs-look-${actor.id}`, window: { title: `RP 무대 — ${actor.name}` } });
     this.actor = actor;
     const cfg = actor.getFlag(MODULE_ID, STAGE_FLAG) ?? {};
-    const hud = actor.getFlag("pf2e-kr-hud", "faces") ?? [];
+    const hud = actor.flags?.["pf2e-kr-hud"]?.faces ?? [];
     this.draft = {
       image: cfg.image ?? "", flip: !!cfg.flip, scale: Number(cfg.scale) || 1, offsetY: Number(cfg.offsetY) || 0,
       framing: ["full", "half"].includes(cfg.framing) ? cfg.framing : "auto",
