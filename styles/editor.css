@@ -1,0 +1,92 @@
+/* ======================================================================== *
+ * Cut-in editor window
+ * ======================================================================== */
+
+.rcc-editor .window-content { padding: 0; display: flex; flex-direction: column; }
+.rcc-ed { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(280px, 1fr); gap: 14px; padding: 12px 14px 8px; }
+.rcc-ed-left { min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.rcc-ed-right { min-width: 0; display: flex; flex-direction: column; gap: 9px; }
+
+/* the preview: a dark "scene" with the cut-in's hold frame on top */
+.rcc-frame.preview { border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.15); pointer-events: auto; cursor: grab; touch-action: none;
+  background: #2b3324;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.28) 1px, transparent 1px);
+  background-size: 6% 10.7%; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45) inset; }
+.rcc-frame.preview.dragging { cursor: grabbing; }
+.rcc-frame.preview.disabled::after { content: "이 캐릭터는 컷인 꺼짐"; position: absolute; inset: auto 8px 8px auto; padding: 2px 8px; border-radius: 4px;
+  background: rgba(0, 0, 0, 0.75); color: #ffb4a8; font-size: 12px; }
+
+.rcc-hint { margin: 0; font-size: 12px; line-height: 1.45; color: var(--color-text-secondary, #9c9581); }
+.rcc-hint i { opacity: 0.8; }
+.rcc-template-hint { font-style: italic; }
+
+.rcc-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.rcc-row .grow, .rcc-ed-footer .grow { flex: 1; }
+.rcc-row button, .rcc-ed-footer button { width: auto; flex: none; height: 30px; min-height: 0; margin: 0; padding: 0 10px; line-height: 1; white-space: nowrap; font-size: 13px; }
+.rcc-row.small button { height: 26px; font-size: 12px; padding: 0 8px; }
+
+.rcc-field { display: flex; flex-direction: column; gap: 4px; margin: 0; }
+.rcc-field > span { font-size: 12px; font-weight: 700; letter-spacing: 0.02em; color: var(--color-text-primary, inherit); }
+.rcc-field > span em { font-weight: 400; font-style: normal; opacity: 0.65; }
+.rcc-field select, .rcc-field input[type="text"] { width: 100%; height: 30px; }
+
+.rcc-pick { display: flex; gap: 4px; }
+.rcc-pick input { flex: 1; min-width: 0; }
+.rcc-pick button { flex: none; width: 32px; height: 30px; min-height: 0; margin: 0; padding: 0; }
+
+.rcc-check { display: flex; align-items: center; gap: 6px; font-size: 13px; margin: 0; }
+.rcc-check.inline { margin-left: auto; font-size: 12px; }
+.rcc-check input { margin: 0; }
+
+.rcc-slider { display: grid; grid-template-columns: 18px 1fr 44px; align-items: center; gap: 6px; }
+.rcc-slider i { opacity: 0.7; text-align: center; font-size: 12px; }
+.rcc-slider input[type="range"] { width: 100%; margin: 0; }
+.rcc-slider output { font-size: 12px; text-align: right; font-variant-numeric: tabular-nums; opacity: 0.85; }
+
+.rcc-color { display: flex; align-items: center; gap: 5px; font-size: 12px; margin: 0; }
+.rcc-color input[type="color"] { width: 34px; height: 24px; padding: 0; border: 1px solid rgba(255, 255, 255, 0.25); border-radius: 4px; background: none; }
+
+.rcc-ed-footer { display: flex; align-items: center; gap: 6px; padding: 8px 14px 12px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+.rcc-ed-footer button.primary { font-weight: 700; }
+
+@container (max-width: 760px) {
+  .rcc-ed { grid-template-columns: 1fr; }
+}
+.rcc-editor .window-content { container-type: inline-size; }
+
+/* character picker */
+.rcc-menu .window-content { padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
+.rcc-pick-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 60vh; overflow-y: auto; }
+.rcc-pick-list button { display: flex; align-items: center; gap: 8px; width: 100%; height: 40px; margin: 0; padding: 0 8px; text-align: left; }
+.rcc-pick-list img { width: 30px; height: 30px; object-fit: cover; object-position: top; border-radius: 4px; border: 1px solid rgba(255, 255, 255, 0.2); }
+.rcc-pick-list span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rcc-pick-list em { font-size: 11px; opacity: 0.6; font-style: normal; }
+
+.rcc-pick[hidden] { display: none; }
+.rcc-row.small select, .rcc-row.small input[type="text"] { flex: 1; min-width: 0; height: 28px; }
+/* 치명타 / 대실패 preview switch and the fumble section */
+.rcc-editor .rcc-mode { gap: 0; }
+.rcc-editor .rcc-mode button { border-radius: 0; }
+.rcc-editor .rcc-mode button:first-child { border-radius: 6px 0 0 6px; }
+.rcc-editor .rcc-mode button:last-child { border-radius: 0 6px 6px 0; }
+.rcc-editor .rcc-mode button.on { background: color-mix(in srgb, #e3262f 35%, transparent); border-color: #e3262f; color: #fff; }
+.rcc-editor .rcc-mode button[data-act="mode-fumble"].on { background: color-mix(in srgb, #5a6aa0 45%, transparent); border-color: #7d8bb5; }
+.rcc-editor .rcc-fumble-ed { margin-top: 6px; padding: 6px 10px; border: 1px solid color-mix(in srgb, #7d8bb5 50%, transparent); border-radius: 8px; background: rgba(60, 75, 120, .12); }
+.rcc-editor .rcc-fumble-ed summary { cursor: pointer; font-weight: 700; }
+.rcc-editor .rcc-fumble-ed summary em { font-weight: normal; opacity: .7; font-size: .85em; }
+.rcc-editor .rcc-fumble-ed[open] summary { margin-bottom: 6px; }
+
+/* 0.9.2 — every window scrolls with the wheel when it is shorter than its contents (the footer stays put) */
+.rcc-editor .window-content { overflow: hidden; min-height: 0; }
+.rcc-editor .rcc-ed { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.rcc-editor .rcc-ed-footer { flex: none; }
+.rcc-editor .rcc-ed-left { position: sticky; top: 0; align-self: start; }
+@container (max-width: 760px) { .rcc-editor .rcc-ed-left { position: static; } }
+.rcc-editor, .rcc-menu, .rcl-editor, .rcs-cast-window, .rcs-actor-window, .rcs-bg-window, .rcs-menu-window { max-height: calc(100vh - 16px); }
+.rcc-menu .window-content, .rcl-editor .window-content, .rcs-cast-window .window-content, .rcs-actor-window .window-content,
+.rcs-bg-window .window-content, .rcs-menu-window .window-content { overflow-y: auto; min-height: 0; overscroll-behavior: contain; }
+/* which picture is being edited */
+.rcc-editor .rcc-tag { display: inline-flex; align-items: center; gap: 4px; padding: 0 6px; border-radius: 4px; font-size: 12px; }
+.rcc-editor .rcc-tag.c { background: color-mix(in srgb, #e3262f 35%, transparent); color: #fff; }
+.rcc-editor .rcc-tag.f { background: color-mix(in srgb, #5a6aa0 55%, transparent); color: #fff; }
+.rcc-editor .rcc-art-field.fumble { padding: 6px 8px; border-radius: 8px; border: 1px solid color-mix(in srgb, #7d8bb5 55%, transparent); background: rgba(60, 75, 120, .12); }
