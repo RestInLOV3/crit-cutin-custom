@@ -1,7 +1,0 @@
-{
-  "public": "plus",
-  "plusFiles": ["scripts/stage/", "scripts/landing/", "scripts/menu.mjs", "styles/stage.css", "styles/landing.css"],
-  "lite": {
-    "styles": ["styles/cutin.css", "styles/editor.css", "styles/settings-window.css"]
-  }
-}
