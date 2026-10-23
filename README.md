@@ -1,15 +1,23 @@
 # Rutz's Cinematic Stage
 
-JRPG·비주얼 노벨풍 연출 모음 — 진지 RP 무대와 내추럴 20·치명타 컷인.
-*Visual-novel RP stage and JRPG-style critical cut-ins for Foundry VTT.*
+JRPG and visual-novel effects for Foundry VTT, in any game system.
 
-- **RP 무대** — 말하는 캐릭터가 자동으로 등장·퇴장하고, 표정과 대사창이 붙습니다.
-- **치명타 컷인** — 내추럴 20이나 치명적 성공에 캐릭터 초상화로 화면 가득 컷인. 직접 만든 템플릿 4종과 효과음.
-- **대실패 컷인** — 내추럴 1이나 치명적 실패에는 같은 그림이 빛바래고, 화면에 금이 가고, 글자가 떨어집니다.
-- 각자 화면에서 볼 수 있는 굴림에만 뜨고, Esc로 건너뜁니다. PF2e는 성공 등급까지, 다른 d20 시스템은 내추럴 20으로 동작합니다.
+- **Critical cut-ins** — a natural 20 or a critical success plays a cut-in with the character's own picture, line and colors. PF2e reads degrees of success; other d20 systems (D&D 5e …) use the natural 20.
+- **Per character** — picture, crop, headline, quote, badge and sound, edited with a live preview.
+- **Plus** — the serious-RP stage (speakers enter and leave on their own, expressions, dialogue box, backdrops), fumble cut-ins, all four looks, and a landing page for your world.
 
-## 설치
+## Lite & Plus
+This is the free edition; the **Plus** features above come with a Patreon membership (same module, so worlds keep their data). During the open beta every feature is free.
+
+## Install
+Foundry → *Add-on Modules* → *Install Module* → Manifest URL:
 ```
 https://github.com/Rutz179/rutz-crit-cutin/releases/latest/download/module.json
 ```
-Foundry VTT v13–v14.
+Foundry VTT v13–v14 · Any system · English / 한국어
+
+The *Cut-in* button on the sheet header, or `game.rutzCutin.play(actor)`.
+
+---
+
+**한국어** — 어떤 시스템에서든 쓰는 JRPG·비주얼 노벨 연출 — 캐릭터 그림으로 뜨는 내추럴 20·치명타 컷인(PF2e는 성공 등급, 다른 d20 시스템은 내추럴 20). Plus: 진지 RP 무대(말하는 캐릭터 자동 등장·표정·대사창·배경), 대실패 컷인, 템플릿 4종, 랜딩 페이지.

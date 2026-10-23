@@ -1,0 +1,629 @@
+{
+  "RCC": {
+    "Common": {
+      "Save": "저장",
+      "Close": "닫기",
+      "On": "켜짐",
+      "Off": "꺼짐",
+      "Auto": "자동",
+      "None": "없음",
+      "Delete": "지우기",
+      "Flip": "좌우 반전",
+      "ChooseFile": "파일 고르기",
+      "Optional": "(선택)",
+      "EmptyPortrait": "비우면 캐릭터 초상화",
+      "NoFilePicker": "파일 선택 창을 열 권한이 없습니다.",
+      "NoFilePickerPaste": "파일 선택 창을 열 권한이 없습니다. 경로를 직접 붙여 넣으세요."
+    },
+    "Settings": {
+      "enabled": {
+        "Name": "치명타 컷인 사용"
+      },
+      "trigger": {
+        "Name": "언제 띄울까",
+        "Hint": "PF2e에서는 '치명적 성공'이 성공 등급(DC 대비 +10 포함)이고, '내추럴 20'은 주사위 눈입니다. 다른 시스템은 내추럴 20으로 판단합니다.",
+        "Choices": {
+          "both": "내추럴 20 또는 치명적 성공",
+          "nat20": "내추럴 20만",
+          "crit": "치명적 성공만"
+        }
+      },
+      "groupSkill": {
+        "Name": "기술·지각 판정에도",
+        "Hint": "공격 굴림은 항상 포함됩니다."
+      },
+      "groupSave": {
+        "Name": "내성 굴림에도"
+      },
+      "groupFlat": {
+        "Name": "플랫 체크·우선권에도"
+      },
+      "npc": {
+        "Name": "NPC에도",
+        "Hint": "플레이어가 소유하지 않은 캐릭터의 치명타에도 컷인을 띄웁니다."
+      },
+      "defaultTemplate": {
+        "Name": "기본 템플릿",
+        "Hint": "캐릭터에 템플릿을 따로 정하지 않았을 때 씁니다."
+      },
+      "defaultTitle": {
+        "Name": "기본 큰 글자"
+      },
+      "badgeText": {
+        "Name": "내추럴 20 문구",
+        "Hint": "내추럴 20일 때 큰 글자 위에 붙는 작은 문구입니다. 비우면 표시하지 않습니다. 캐릭터마다 편집기에서 바꾸거나 끌 수도 있습니다."
+      },
+      "soundPreset": {
+        "Name": "기본 효과음",
+        "Hint": "효과음 1~5는 모듈이 그 자리에서 만들어 내는 소리입니다(음원 파일 없음). '파일'을 고르면 아래 경로의 파일을 씁니다."
+      },
+      "defaultSound": {
+        "Name": "기본 효과음 파일",
+        "Hint": "위에서 '파일'을 골랐을 때 쓰는 효과음입니다."
+      },
+      "fumbleEnabled": {
+        "Name": "대실패 컷인 사용",
+        "Hint": "치명적 실패(또는 내추럴 1)에도 컷인을 띄웁니다. 같은 템플릿·그림에 차갑게 빛바랜 색, 금 가는 화면, 떨어지는 글자로. 판정 종류·NPC 조건은 위의 치명타 설정을 그대로 따릅니다."
+      },
+      "fumbleTrigger": {
+        "Name": "대실패 — 언제 띄울까",
+        "Hint": "PF2e에서는 '치명적 실패'가 성공 등급(DC 대비 −10 포함)이고, '내추럴 1'은 주사위 눈입니다.",
+        "Choices": {
+          "both": "내추럴 1 또는 치명적 실패",
+          "nat1": "내추럴 1만",
+          "critfail": "치명적 실패만"
+        }
+      },
+      "fumbleTitle": {
+        "Name": "대실패 큰 글자"
+      },
+      "fumbleBadge": {
+        "Name": "내추럴 1 문구",
+        "Hint": "내추럴 1일 때 붙는 작은 문구. 비우면 표시하지 않습니다."
+      },
+      "fumbleSound": {
+        "Name": "대실패 기본 효과음",
+        "Hint": "실패음 1~3도 모듈이 만들어 내는 소리입니다."
+      },
+      "fumbleSoundFile": {
+        "Name": "대실패 효과음 파일"
+      },
+      "show": {
+        "Name": "내 화면의 컷인",
+        "Choices": {
+          "full": "켜기",
+          "reduced": "움직임 줄이기 (페이드만)",
+          "off": "끄기"
+        }
+      },
+      "duration": {
+        "Name": "컷인 길이 (초)"
+      },
+      "volume": {
+        "Name": "컷인 효과음 크기",
+        "Hint": "Foundry의 인터페이스 볼륨에 곱해집니다."
+      },
+      "waitDice": {
+        "Name": "Dice So Nice 주사위가 멈춘 뒤 재생"
+      },
+      "landingShow": {
+        "Name": "랜딩 페이지: 내 화면에 보이기",
+        "Hint": "끄면 랜딩 장면에서도 바로 맵이 보입니다."
+      },
+      "landingMotion": {
+        "Name": "랜딩 페이지: 움직임",
+        "Hint": "빛줄기·안개·불티와 천천히 다가가는 배경. '줄이기'면 멈춘 그림만.",
+        "Choices": {
+          "full": "켜기",
+          "reduced": "줄이기"
+        }
+      },
+      "stageSlots": {
+        "Name": "RP 무대: 한 번에 서는 인원",
+        "Hint": "5명은 넓은 화면에서만 권합니다. 칸이 좁아져 그림이 작아지고, 날개 같은 넓은 그림은 옆 칸에 겹칩니다.",
+        "Choices": {
+          "3": "3명",
+          "4": "4명 (큰 화면)",
+          "5": "5명 (아주 넓은 화면)"
+        }
+      },
+      "stageInset": {
+        "Name": "RP 무대: 화면 가장자리 여백 (%)",
+        "Hint": "0이면 화면 전체가 무대입니다. 값을 주면 사방이 그만큼 줄어든 '장면 창'이 되고, 바깥은 어둡게 가린 배틀맵이 보입니다. 권장 5~8."
+      },
+      "stageHold": {
+        "Name": "RP 무대: 발언권 (초)",
+        "Hint": "말을 마친 뒤 이 시간 동안은 새로 온 캐릭터에게 밀려나지 않습니다. 입력 중일 때는 항상 지켜집니다."
+      },
+      "stageDim": {
+        "Name": "RP 무대: 회색으로 물러나기까지 (초)"
+      },
+      "stageLeave": {
+        "Name": "RP 무대: 저절로 퇴장 (초)",
+        "Hint": "이 시간 동안 아무 말이 없으면 새 화자가 없어도 무대에서 내려갑니다. 0이면 자리를 내줄 때까지 남습니다."
+      },
+      "stageFaceSeconds": {
+        "Name": "RP 무대: 표정 유지 (초)",
+        "Hint": "대사의 \"@웃음\"은 이 시간(긴 대사는 조금 더) 뒤 기본 얼굴로 돌아옵니다. \"@@웃음\"은 바꿀 때까지 유지됩니다."
+      },
+      "stageNarration": {
+        "Name": "RP 무대: GM 나레이션",
+        "Hint": "말하는 캐릭터 바의 🪶(나레이션)로 쓴 말을 이름표 없는 나레이션으로 대사창에 띄웁니다."
+      },
+      "stageLineSeconds": {
+        "Name": "RP 무대: 대사가 사라지기까지 (초)",
+        "Hint": "마지막 대사가 이 시간 뒤 대사창에서 사라집니다. 0이면 다음 대사까지 남습니다."
+      },
+      "stageVoice": {
+        "Name": "RP 무대: 음성(디스코드)으로도 등장",
+        "Hint": "디스코드 음성 연동이 있으면, 말을 하는 사람의 캐릭터(바에 고정한 캐릭터, 없으면 할당된 캐릭터)가 입력할 때처럼 무대에 오릅니다. 바의 🎙 버튼으로도 켜고 끕니다."
+      },
+      "stageOwnedCast": {
+        "Name": "RP 무대: 플레이어는 소유한 캐릭터로 말할 수 있음",
+        "Hint": "끄면 GM이 'RP 발언권'에서 정해 준 캐릭터로만 말할 수 있습니다."
+      },
+      "stageTypewriter": {
+        "Name": "RP 무대: 대사 타자기 효과",
+        "Hint": "대사가 한 글자씩(초당 약 40자) 나타납니다. 끄면 한 번에 보입니다."
+      },
+      "stagePause": {
+        "Name": "RP 모드 동안 게임 일시정지",
+        "Hint": "RP 모드를 켜면 일시정지하고, 끌 때 원래대로 풀어 줍니다(이미 일시정지였으면 그대로 둡니다)."
+      },
+      "stageHidePause": {
+        "Name": "RP 모드 동안 일시정지 표시 숨기기",
+        "Hint": "화면 가운데의 일시정지 그림·글자(Alternative Pause Text 포함)를 숨기고, 무대 구석에 작은 ⏸ 표시만 둡니다."
+      },
+      "stagePickBg": {
+        "Name": "RP 모드를 켤 때 배경 고르기 창 열기"
+      },
+      "stageLockView": {
+        "Name": "배경이 맵을 가리는 동안 플레이어 화면 고정",
+        "Hint": "RP 배경 그림이 깔려 있으면 플레이어가 맵을 끌어 옮기거나 확대하거나 토큰 위에 마우스를 올릴 수 없습니다."
+      },
+      "stageHideHud": {
+        "Name": "RP 무대 중 파티 초상화·턴 트래커 숨기기"
+      },
+      "stageShow": {
+        "Name": "내 화면에 RP 무대 보이기"
+      },
+      "speakerBar": {
+        "Name": "말하는 캐릭터 바",
+        "Hint": "채팅 입력창 위의 얼굴 줄. 누르면 그 캐릭터로 말하기가 고정됩니다(다른 토큰을 눌러도 안 바뀜). 자동: GM은 RP 모드이거나 바에 누가 있을 때, 플레이어는 캐릭터가 둘 이상일 때 보입니다.",
+        "Choices": {
+          "auto": "자동",
+          "always": "항상",
+          "off": "끄기 (Foundry 기본대로)"
+        }
+      }
+    },
+    "Menus": {
+      "editor": {
+        "Name": "캐릭터별 컷인 편집",
+        "Label": "컷인 편집기 열기",
+        "Hint": "캐릭터마다 그림·위치·확대·색·대사·효과음을 정합니다. 캐릭터 시트 위쪽의 ⚡ 버튼으로도 열 수 있습니다."
+      },
+      "landingEditor": {
+        "Name": "랜딩 페이지",
+        "Label": "랜딩 페이지 꾸미기",
+        "Hint": "지금 보고 있는 장면을 캠페인 타이틀 화면으로 꾸밉니다."
+      },
+      "stageCast": {
+        "Name": "진지 RP 무대 — 발언권",
+        "Label": "발언권 창 열기",
+        "Hint": "진지 RP 모드를 켜고 끄며, 플레이어가 소유하지 않은 캐릭터(NPC 등)로 말할 수 있게 맡깁니다. 왼쪽 '러츠 툴킷' 탭에도 있습니다."
+      },
+      "stageBackdrop": {
+        "Name": "진지 RP 무대 — 배경",
+        "Label": "배경 고르기",
+        "Hint": "배경 그림을 폴더별로 모아 두고 고릅니다. RP 모드를 켤 때도 열립니다."
+      }
+    },
+    "Keybindings": {
+      "stageToggle": "진지 RP 모드 켜기/끄기 (GM)"
+    },
+    "Sheet": {
+      "Button": "컷인",
+      "Control": "치명타 컷인"
+    },
+    "Controls": {
+      "Menu": "연출 — RP 무대 · 랜딩 페이지"
+    },
+    "SettingsWindow": {
+      "Title": "Rutz's Cinematic Stage 설정",
+      "Tabs": {
+        "cutin": "치명타 컷인",
+        "stage": "진지 RP 무대",
+        "landing": "랜딩 페이지",
+        "other": "기타"
+      },
+      "Menus": {
+        "editor": "캐릭터별 컷인 편집기",
+        "stageBackdrop": "배경 고르기",
+        "landingEditor": "랜딩 페이지 꾸미기"
+      },
+      "Sections": {
+        "when": "언제 띄울까",
+        "look": "기본 모양·소리",
+        "fumble": "대실패 컷인",
+        "screen": "내 화면",
+        "stage": "무대",
+        "timing": "등장·퇴장 시간",
+        "rpOn": "RP 모드를 켤 때",
+        "speakers": "말하는 캐릭터·발언권",
+        "display": "표시"
+      },
+      "WorldTip": "월드 설정 — 모두에게 적용",
+      "World": "월드",
+      "Empty": "이 항목에서 바꿀 수 있는 설정이 없습니다.",
+      "Defaults": "이 항목 기본값으로",
+      "Saved": "설정을 저장했습니다.",
+      "MenuName": "{tab} 설정",
+      "MenuLabel": "{tab} 상세 설정"
+    },
+    "Menu": {
+      "Title": "연출 — Cinematic Stage",
+      "Look": "무대 그림·표정 (지금 말하는 캐릭터)",
+      "LandingEdit": "이 장면의 랜딩 페이지 꾸미기",
+      "LandingMake": "이 장면을 랜딩 페이지로 꾸미기",
+      "LandingShow": "랜딩 페이지 다시 보기",
+      "Settings": "설정"
+    },
+    "Editor": {
+      "NoFilePicker": "파일 선택 창을 열 권한이 없습니다. 파일 경로를 직접 붙여 넣거나 GM에게 업로드를 부탁하세요.",
+      "WorldDefault": "월드 기본 ({label})",
+      "NoActor": "컷인을 편집할 캐릭터를 찾지 못했습니다.",
+      "NotOwner": "자신이 소유한 캐릭터만 편집할 수 있습니다.",
+      "Title": "치명타 컷인 — {name}",
+      "PreviewAria": "미리보기 — 끌어서 위치, 휠로 확대",
+      "DragHint": "그림을 <b>끌어서 위치</b>, <b>휠로 확대</b>를 맞춥니다. 위치·확대는 <b>지금 고른 템플릿에만</b> 저장됩니다.",
+      "Crit": "치명타",
+      "Fumble": "대실패",
+      "PlayHere": "여기서 재생",
+      "PlayFull": "내 화면 전체로 재생",
+      "BroadcastTip": "저장하지 않은 지금 모습 그대로 접속한 모두에게 한 번 보여 줍니다",
+      "Broadcast": "모두에게 재생",
+      "ResetCropTip": "이 템플릿의 위치·확대를 기본값으로",
+      "ResetCrop": "위치 초기화",
+      "Enabled": "이 캐릭터의 치명타 컷인 사용",
+      "Template": "템플릿",
+      "Picture": "그림",
+      "PictureNote": "(왼쪽 아래 치명타/대실패로 바꿔 가며 따로 지정)",
+      "FumbleImagePlaceholder": "비우면 치명타 그림을 그대로 씀",
+      "SameAsCrit": "치명타 그림과 같게",
+      "Portrait": "캐릭터 초상화",
+      "TokenArt": "토큰 그림",
+      "Crop": "위치·확대",
+      "ThisTemplate": "(이 템플릿)",
+      "Colors": "색",
+      "Accent": "강조",
+      "Base": "바탕",
+      "ResetColors": "템플릿 기본 색",
+      "Headline": "큰 글자",
+      "Quote": "대사",
+      "QuotePlaceholder": "예) 이걸로 끝이다!",
+      "Badge": "내추럴 20 문구",
+      "BadgeOff": "(월드 설정에서 꺼짐)",
+      "HideBadge": "표시 안 함",
+      "Sound": "효과음",
+      "ListenTip": "지금 고른 효과음 듣기",
+      "Listen": "듣기",
+      "SoundPath": "효과음 파일 경로 (ogg / mp3 / wav)",
+      "FumbleSection": "대실패 컷인",
+      "FumbleSectionNote": "(같은 템플릿, 그림은 위에서 따로 · 차갑게 빛바랜 색·금 가는 화면·떨어지는 글자)",
+      "FumbleEnabled": "이 캐릭터의 대실패 컷인 사용",
+      "FumbleQuotePlaceholder": "예) 어… 이게 아닌데?",
+      "FumbleBadge": "내추럴 1 문구",
+      "ListenFumbleTip": "대실패 효과음 듣기",
+      "Defaults": "모두 기본값으로",
+      "Saved": "{name}의 치명타 컷인을 저장했습니다.",
+      "SaveFailed": "저장하지 못했습니다. 이 캐릭터의 소유 권한을 확인해 주세요.",
+      "PickTitle": "치명타 컷인 — 캐릭터 고르기",
+      "PickNone": "편집할 수 있는 캐릭터가 없습니다. 캐릭터를 소유하고 있는지 확인하세요.",
+      "PickHint": "컷인을 편집할 캐릭터를 고르세요. 캐릭터 시트 위쪽의 <i class=\"fa-solid fa-bolt\"></i> 버튼으로도 열 수 있습니다.",
+      "OffLabel": "이 캐릭터는 컷인 꺼짐"
+    },
+    "Sound": {
+      "Presets": {
+        "synth1": "효과음 1",
+        "synth2": "효과음 2",
+        "synth3": "효과음 3",
+        "synth4": "효과음 4",
+        "synth5": "효과음 5"
+      },
+      "Fumble": {
+        "fumble1": "실패음 1 — 뿌우우 (김빠진 나팔)",
+        "fumble2": "실패음 2 — 쨍그랑 (깨지는 소리)",
+        "fumble3": "실패음 3 — 쿵… 휘유우 (떨어지는 소리)"
+      },
+      "File": "파일",
+      "FileEllipsis": "파일…",
+      "FilePath": "파일 (아래 경로)",
+      "None": "효과음 없음"
+    },
+    "Templates": {
+      "strike": {
+        "Label": "스트라이크 — 붉은 사선 · 큰 글자",
+        "Hint": "사선으로 화면을 가르는 띠, 망점 무늬, 비스듬한 초상화 패널과 튀어나오는 글자."
+      },
+      "band": {
+        "Label": "엠블럼 — 가로 띠 · 빛줄기",
+        "Hint": "위아래가 검게 닫히고 가운데 띠로 얼굴이 미끄러져 들어온 뒤 빛이 훑고 지나갑니다."
+      },
+      "eyes": {
+        "Label": "아이라인 — 눈가 클로즈업 띠",
+        "Hint": "가늘고 긴 띠에 눈가만 확대해 스치듯 지나갑니다. 위치를 눈에 맞춰 주세요."
+      },
+      "simple": {
+        "Label": "심플 — 초상화 · 금빛 글자",
+        "Hint": "초상화가 아래에서 떠오르고 글자가 빛납니다. 가장 덜 요란한 연출."
+      }
+    },
+    "Landing": {
+      "Templates": {
+        "cinematic": {
+          "Label": "시네마틱",
+          "Hint": "위아래 검은 띠, 천천히 다가가는 배경, 왼쪽 아래 큰 제목"
+        },
+        "fantasy": {
+          "Label": "다크 판타지",
+          "Hint": "어두운 금테 액자, 가운데 제목과 세로 메뉴, 아래에 초상 카드"
+        },
+        "jrpg": {
+          "Label": "JRPG 타이틀",
+          "Hint": "밝은 로고, 오른쪽 메뉴와 화살표 커서, 비스듬한 파티 패널"
+        },
+        "silhouette": {
+          "Label": "실루엣 파티",
+          "Hint": "검은 판 위에 파티가 한 줄로 — 마우스를 올린 사람만 빛을 받음"
+        },
+        "storybook": {
+          "Label": "동화책",
+          "Hint": "양피지 책장 위의 제목과 메뉴, 핀으로 꽂은 사진 같은 초상"
+        },
+        "neon": {
+          "Label": "사이버 네온",
+          "Hint": "어둠 속 네온 격자 바닥, 터미널 메뉴, 홀로그램 ID 카드"
+        },
+        "dossier": {
+          "Label": "기밀 문서",
+          "Hint": "책상 위 서류철, 타자기 글씨와 붉은 도장, 클립으로 끼운 사진 (CoC에 잘 어울림)"
+        },
+        "tarot": {
+          "Label": "타로·별자리",
+          "Hint": "별밤 아래 부채꼴로 펼친 타로 카드, 별 모양 메뉴"
+        }
+      },
+      "Fonts": {
+        "default": "모양 기본값",
+        "serif": "기본 명조",
+        "sans": "기본 고딕",
+        "songmyung": "송명 — 붓 명조",
+        "gowunbatang": "고운바탕 — 부드러운 명조",
+        "hahmlet": "함렛 — 굵은 명조",
+        "nanummyeongjo": "나눔명조",
+        "diphylleia": "디필레이아 — 우아한",
+        "blackhansans": "블랙한산스 — 아주 굵게",
+        "dohyeon": "도현 — 각진 고딕",
+        "jua": "주아 — 둥근",
+        "gowundodum": "고운돋움",
+        "orbit": "오르빗 — SF",
+        "nanumpen": "나눔손글씨 펜",
+        "gaegu": "개구 — 손글씨",
+        "typewriter": "타자기 (고정폭)",
+        "cinzel": "Cinzel — 라틴 대문자 (한글은 명조)"
+      },
+      "Actions": {
+        "enter": "입장하기 (이 화면 닫기)",
+        "sheet": "내 캐릭터 시트",
+        "shop": "상점 — 아이템 브라우저",
+        "journal": "저널 열기",
+        "scene": "장면으로 이동",
+        "url": "웹 링크 (새 탭)",
+        "macro": "매크로 실행",
+        "stage": "진지 RP 모드 켜기 (GM)"
+      },
+      "Particles": {
+        "none": "없음",
+        "embers": "불티 (위로)",
+        "dust": "먼지·빛가루",
+        "snow": "눈",
+        "petals": "꽃잎"
+      },
+      "Menu": {
+        "enter": "입장하기",
+        "shop": "상점",
+        "sheet": "내 캐릭터"
+      },
+      "Design": "랜딩 페이지 꾸미기",
+      "ShowAll": "모두에게 다시 보이기",
+      "EnterAll": "모두 입장시키기 (모두의 화면에서 닫기)",
+      "CloseMine": "내 화면에서만 닫기",
+      "NoCharacter": "할당된 캐릭터가 없습니다.",
+      "NoJournal": "연결된 저널을 찾을 수 없습니다.",
+      "NoScene": "연결된 장면을 찾을 수 없습니다.",
+      "NoMacro": "연결된 매크로를 찾을 수 없습니다."
+    },
+    "LandingEditor": {
+      "NoScene": "열린 장면이 없습니다.",
+      "Title": "랜딩 페이지 — {name}",
+      "Tabs": {
+        "basic": "기본",
+        "type": "글자",
+        "menu": "메뉴",
+        "cards": "카드",
+        "light": "조명"
+      },
+      "PreviewHint": "미리보기는 실제 화면을 줄인 모습입니다. 저장하면 이 장면을 보고 있는 모두에게 바로 바뀝니다.",
+      "Enabled": "이 장면을 랜딩 페이지로 쓰기",
+      "Reset": "처음 모양으로",
+      "Look": "모양",
+      "TitleField": "제목",
+      "TitlePlaceholder": "비우면 장면 이름",
+      "Subtitle": "제목 위 작은 글",
+      "SubtitlePlaceholder": "예: Pathfinder 캠페인",
+      "Tagline": "제목 아래 한 줄",
+      "TaglinePlaceholder": "예: 제 7화 — 붉은 달의 밤",
+      "Note": "맨 아래 메모",
+      "NotePlaceholder": "예: 다음 세션 10월 20일 (일) 20:00",
+      "Background": "배경",
+      "BgImage": "그림·영상",
+      "BgDark": "어둠 (그림 없이 빛만)",
+      "BgMedia": "배경 그림·영상",
+      "BgPlaceholder": "비우면 이 장면의 배경 그림",
+      "Logo": "제목 대신 로고 그림",
+      "LogoPlaceholder": "비우면 제목 글자",
+      "Cover": "가리는 범위",
+      "CoverBoard": "맵만 (채팅창은 보임)",
+      "CoverAll": "화면 전체",
+      "Custom": "직접 정하기",
+      "TitleFont": "제목 글꼴",
+      "BodyFont": "본문·버튼 글꼴",
+      "FontHint": "글꼴은 Google Fonts에서 처음 쓸 때 받아 옵니다(인터넷이 없으면 기본 글꼴로 보입니다).",
+      "TitleColor": "제목 색",
+      "TextColor": "글자 색",
+      "AccentColor": "강조 색 (선·버튼 테두리·아이콘)",
+      "ColorHint": "'직접 정하기'를 끄면 그 모양의 기본 색(예: 다크 판타지의 금빛 제목)을 씁니다.",
+      "TargetPlaceholder": "사이드바에서 끌어다 놓거나 UUID",
+      "IconTip": "Font Awesome 아이콘 이름",
+      "ButtonText": "버튼 글자",
+      "MoveUp": "위로",
+      "MoveDown": "아래로",
+      "MenuHint": "저널·장면·매크로는 사이드바에서 그 줄로 끌어다 놓으면 연결됩니다. 웹 링크는 디스코드·위키 주소 등.",
+      "NoButtons": "버튼이 없습니다.",
+      "AddButton": "버튼 추가",
+      "NewButton": "새 버튼",
+      "ShowCards": "파티 프로필 카드 보이기",
+      "ShowLevel": "종족·직업·레벨 보이기",
+      "ShowPlayer": "플레이어 이름과 접속 표시 보이기",
+      "CardActors": "카드에 넣을 캐릭터",
+      "CardActorsHint": "하나도 고르지 않으면 플레이어 캐릭터 전부. 카드를 누르면 (볼 권한이 있을 때) 시트가 열립니다.",
+      "NoActors": "캐릭터가 없습니다.",
+      "Vignette": "가장자리 어둡게 (비네트)",
+      "Grade": "강조 색으로 물들이기",
+      "Rays": "빛줄기 (위에서 비스듬히 내려오는 빛)",
+      "Fog": "낮게 흐르는 안개",
+      "Flicker": "촛불처럼 은은하게 깜박임",
+      "Particles": "떠다니는 입자",
+      "LightHint": "모두 CSS로만 그려서 가볍습니다. 플레이어는 설정에서 움직임을 '줄이기'로 바꿀 수 있습니다.",
+      "Saved": "'{name}'의 랜딩 페이지를 저장했습니다.",
+      "SavedOff": "저장했습니다 (이 장면의 랜딩 페이지는 꺼져 있습니다)."
+    },
+    "Stage": {
+      "Aria": "RP 무대",
+      "Paused": "일시정지 중",
+      "Speaking": "말하는 중…",
+      "Typing": "입력 중…",
+      "RefMissing": "'{name}'을(를) 찾을 수 없습니다.",
+      "RefNoPermission": "'{name}'을(를) 볼 권한이 없습니다.",
+      "ClickToOpen": "눌러서 열기",
+      "TurnOn": "진지 RP 모드 켜기",
+      "TurnOff": "진지 RP 모드 끄기",
+      "PickBackground": "RP 배경 고르기",
+      "CastMenu": "발언권 — 플레이어가 맡을 캐릭터"
+    },
+    "Cast": {
+      "Title": "RP 무대 — 발언권",
+      "LookTip": "무대 그림·표정",
+      "Remove": "빼기",
+      "Max": "최대 {n}명",
+      "AddPlaceholder": "+ 맡길 캐릭터…",
+      "On": "진지 RP 모드 켜짐",
+      "Normal": "평소 모드",
+      "OnHint": "입력을 시작하면 그 캐릭터가 무대에 오릅니다.",
+      "OffHint": "켜면 모두의 화면에 RP 무대가 열립니다.",
+      "Backdrop": "배경",
+      "BackToNormal": "평소 모드로",
+      "Slots": "한 번에 서는 인원",
+      "People": "{n}명",
+      "Players": "플레이어 — 누구로 말할 수 있나",
+      "OwnedNote": "흐린 칸은 그 플레이어가 소유한 캐릭터로, 자동으로 말할 수 있습니다.",
+      "Help": "그 밖에 NPC 등을 맡기려면 여기서 넣으세요(소유권은 그대로). 사이드바의 액터를 줄 위로 끌어다 놓아도 됩니다. 플레이어는 채팅창 위 <b>말하는 캐릭터 바</b>에서 고릅니다.<br>GM은 따로 정할 필요가 없습니다: Alt+토큰 클릭이나 바의 + 로 아무 캐릭터나 바에 올리세요.",
+      "NoPlayers": "접속한 플레이어가 없습니다.",
+      "Limit": "한 플레이어에게 {n}명까지 맡길 수 있습니다."
+    },
+    "Look": {
+      "PickFirst": "말하는 캐릭터 바에서 캐릭터를 고르거나 토큰을 선택한 뒤 여세요.",
+      "NotOwner": "이 캐릭터의 무대 설정을 바꿀 권한이 없습니다.",
+      "Title": "RP 무대 — {name}",
+      "Keyword": "키워드",
+      "PicturePath": "그림 경로",
+      "ChoosePicture": "그림 고르기",
+      "Preview": "미리보기",
+      "RefTip": "중간 크기 캐릭터의 머리 높이",
+      "Picture": "무대 그림",
+      "Size": "덩치",
+      "AutoSize": "자동 ({size})",
+      "Framing": "그림 종류",
+      "Full": "전신 (발까지)",
+      "Half": "상반신·잘린 그림",
+      "Scale": "크기 보정",
+      "Height": "높이 (위로 +)",
+      "Faces": "표정",
+      "FacesHint": "대사에 \"@키워드\" → 몇 초 뒤 기본 얼굴로, \"@@키워드\" → 계속 유지. \"@기본\"은 원래 그림.",
+      "NoFaces": "아직 표정이 없습니다.",
+      "AddFace": "표정 추가",
+      "Reset": "기본값으로",
+      "Detected": "자동 판단: {kind}{note}. 점선은 중간 크기 캐릭터의 머리 높이입니다.",
+      "DetectedCut": "상반신·잘린 그림 (아래를 대사창 뒤로 숨김)",
+      "DetectedFull": "전신 (발이 대사창 바로 뒤)",
+      "NotMeasured": "다른 사이트의 그림이라 여백을 잴 수 없음",
+      "Saved": "{name}의 무대 설정을 저장했습니다."
+    },
+    "Bar": {
+      "NoRight": "이 캐릭터로 말할 권한이 없습니다. GM이 RP 발언권에 넣어 주면 쓸 수 있어요.",
+      "Note": {
+        "character": "내 캐릭터",
+        "cast": "GM이 맡긴 캐릭터",
+        "owned": "이 장면의 내 토큰"
+      },
+      "RightClickRemove": "우클릭: 바에서 빼기",
+      "ClickPin": "클릭: 이 캐릭터로 말하기 고정 (다시 누르면 해제)",
+      "AltRightClick": "Alt+우클릭: 무대 그림·표정",
+      "Narration": "나레이션",
+      "NarrationHint": "캐릭터가 아닌 나레이션으로 말하기 (채팅 모드와 상관없이)",
+      "Voice": "음성(디스코드)으로도 등장: {state}",
+      "VoiceHint": "말을 하면 그 사람의 캐릭터가 무대에 오릅니다",
+      "EmptyGM": "Alt+토큰 클릭으로 추가",
+      "EmptyPlayer": "+ 로 캐릭터 추가",
+      "Add": "선택한 토큰을 바에 추가",
+      "AddHint": "Alt+토큰 클릭 · 사이드바 액터 끌어 놓기도 됩니다",
+      "SelectFirst": "바에 넣을 토큰을 먼저 선택하세요. Alt를 누른 채 토큰을 클릭하면 바로 들어갑니다.",
+      "CantRemoveGM": "맡긴 캐릭터는 RP 발언권 창에서 뺄 수 있습니다.",
+      "CantRemove": "내 캐릭터, GM이 맡긴 캐릭터, 이 장면의 내 토큰은 바에서 뺄 수 없습니다.",
+      "NarrationFailed": "나레이션을 보내지 못했습니다.",
+      "HudRemove": "말하는 캐릭터 바에서 빼기",
+      "HudAdd": "말하는 캐릭터 바에 넣고 이 캐릭터로 말하기"
+    },
+    "Backdrop": {
+      "Title": "RP 무대 — 배경",
+      "FolderTip": "두 번 클릭: 이름 바꾸기 · 그림을 여기로 끌어 옮기기",
+      "DeleteFolder": "폴더 지우기 (그림은 '폴더 없음'으로)",
+      "RemoveItem": "목록에서 빼기 (파일은 그대로)",
+      "All": "전체",
+      "NoFolder": "폴더 없음",
+      "NewFolderName": "새 폴더 이름",
+      "NewFolder": "새 폴더",
+      "None": "배경 없음",
+      "NoneHint": "배틀맵을 흐리게",
+      "EmptyFolder": "이 폴더는 비어 있습니다. 다른 탭의 그림을 이 탭으로 끌어 오세요.",
+      "EmptyLibrary": "아래 '그림 추가'나 '폴더째 가져오기'로 배경을 모아 두세요.",
+      "Dim": "어둡게",
+      "AddPicture": "그림 추가",
+      "ImportFolder": "폴더째 가져오기",
+      "Hint": "누르면 바로 모두의 무대에 깔립니다. RP 모드를 켤 때마다 이 창이 열립니다(설정에서 끌 수 있음).",
+      "ReadFailed": "그 폴더를 읽지 못했습니다.",
+      "NoPictures": "그 폴더에 그림이 없습니다.",
+      "ImportedFolder": "가져온 배경",
+      "Imported": "배경 {count}개를 '{name}' 폴더로 가져왔습니다."
+    },
+    "Size": {
+      "tiny": "아주 작음",
+      "sm": "작음",
+      "med": "중간",
+      "lg": "큼",
+      "huge": "거대",
+      "grg": "초거대"
+    }
+  }
+}

@@ -10,33 +10,49 @@
  * keyframes run in → hold → out over --dur.
  * ======================================================================== */
 
-export const TEMPLATES = {
+import { k, t } from "./i18n.mjs";
+import { PLUS } from "./edition.mjs";
+
+/** label and hint are looked up when read (game.i18n is not ready while modules load). */
+const ALL_TEMPLATES = {
   strike: {
-    label: "스트라이크 — 붉은 사선 · 큰 글자",
-    hint: "사선으로 화면을 가르는 띠, 망점 무늬, 비스듬한 초상화 패널과 튀어나오는 글자.",
+    get label() { return t("Templates.strike.Label"); },
+    get hint() { return t("Templates.strike.Hint"); },
     crop: { x: 50, y: 18, zoom: 1.15 },
     accent: "#e3262f", accent2: "#0b0b0d"
   },
   band: {
-    label: "엠블럼 — 가로 띠 · 빛줄기",
-    hint: "위아래가 검게 닫히고 가운데 띠로 얼굴이 미끄러져 들어온 뒤 빛이 훑고 지나갑니다.",
+    get label() { return t("Templates.band.Label"); },
+    get hint() { return t("Templates.band.Hint"); },
     crop: { x: 50, y: 30, zoom: 1 },
     accent: "#f2c14e", accent2: "#0d1b3a"
   },
   eyes: {
-    label: "아이라인 — 눈가 클로즈업 띠",
-    hint: "가늘고 긴 띠에 눈가만 확대해 스치듯 지나갑니다. 위치를 눈에 맞춰 주세요.",
+    get label() { return t("Templates.eyes.Label"); },
+    get hint() { return t("Templates.eyes.Hint"); },
     crop: { x: 50, y: 33, zoom: 1.1 },
     accent: "#39c6f0", accent2: "#050608"
   },
   simple: {
-    label: "심플 — 초상화 · 금빛 글자",
-    hint: "초상화가 아래에서 떠오르고 글자가 빛납니다. 가장 덜 요란한 연출.",
+    get label() { return t("Templates.simple.Label"); },
+    get hint() { return t("Templates.simple.Hint"); },
     crop: { x: 50, y: 15, zoom: 1 },
     accent: "#e2b93b", accent2: "#120f0b"
   }
 };
 
+/** Setting choices: the labels' i18n keys (settings are registered before translations load). */
+export function templateKeyChoices() {
+  return {
+    strike: k("Templates.strike.Label"),
+    band: k("Templates.band.Label"),
+    eyes: k("Templates.eyes.Label"),
+    simple: k("Templates.simple.Label")
+  };
+}
+
+/** Lite has two of the four looks; the band and the eyes are the Plus edition's. */
+export const TEMPLATES = PLUS ? ALL_TEMPLATES : { strike: ALL_TEMPLATES.strike, simple: ALL_TEMPLATES.simple };
 export const DEFAULT_TEMPLATE = "strike";
 
 /** The fumble look's colours per template (cold, washed out). */

@@ -1,4 +1,6 @@
 import { MODULE_ID } from "./config.mjs";
+import { k, t } from "./i18n.mjs";
+import { PLUS } from "./edition.mjs";
 
 /* ======================================================================== *
  * Settings, tidied (same shape as Rutz's PF2e HUD)
@@ -12,42 +14,47 @@ import { MODULE_ID } from "./config.mjs";
  * ======================================================================== */
 
 /** Stays in Foundry's own list. */
-export const BASIC = ["enabled", "show", "stageSlots", "speakerBar"];
+export const BASIC = PLUS ? ["enabled", "show", "stageSlots", "speakerBar"] : ["enabled", "show"];
 
+// Labels and titles are getters: game.i18n is not ready while modules load.
 export const TABS = [
   {
-    id: "cutin", label: "치명타 컷인", icon: "fa-solid fa-bolt",
-    menus: [{ key: "editor", label: "캐릭터별 컷인 편집기", icon: "fa-solid fa-bolt" }],
+    id: "cutin", get label() { return t("SettingsWindow.Tabs.cutin"); }, icon: "fa-solid fa-bolt",
+    menus: [{ key: "editor", get label() { return t("SettingsWindow.Menus.editor"); }, icon: "fa-solid fa-bolt" }],
     sections: [
-      { title: "언제 띄울까", keys: ["enabled", "trigger", "groupSkill", "groupSave", "groupFlat", "npc"] },
-      { title: "기본 모양·소리", keys: ["defaultTemplate", "defaultTitle", "badgeText", "soundPreset", "defaultSound"] },
-      { title: "대실패 컷인", keys: ["fumbleEnabled", "fumbleTrigger", "fumbleTitle", "fumbleBadge", "fumbleSound", "fumbleSoundFile"] },
-      { title: "내 화면", keys: ["show", "duration", "volume", "waitDice"] }
+      { get title() { return t("SettingsWindow.Sections.when"); }, keys: ["enabled", "trigger", "groupSkill", "groupSave", "groupFlat", "npc"] },
+      { get title() { return t("SettingsWindow.Sections.look"); }, keys: ["defaultTemplate", "defaultTitle", "badgeText", "soundPreset", "defaultSound"] },
+      // @plus
+      { get title() { return t("SettingsWindow.Sections.fumble"); }, keys: ["fumbleEnabled", "fumbleTrigger", "fumbleTitle", "fumbleBadge", "fumbleSound", "fumbleSoundFile"] },
+      // @end-plus
+      { get title() { return t("SettingsWindow.Sections.screen"); }, keys: ["show", "duration", "volume", "waitDice"] }
     ]
   },
+  // @plus
   {
-    id: "stage", label: "진지 RP 무대", icon: "fa-solid fa-masks-theater",
+    id: "stage", get label() { return t("SettingsWindow.Tabs.stage"); }, icon: "fa-solid fa-masks-theater",
     menus: [
-      { key: "stageCast", label: "발언권 — 플레이어가 맡을 캐릭터", icon: "fa-solid fa-users-rectangle" },
-      { key: "stageBackdrop", label: "배경 고르기", icon: "fa-solid fa-image" }
+      { key: "stageCast", get label() { return t("Stage.CastMenu"); }, icon: "fa-solid fa-users-rectangle" },
+      { key: "stageBackdrop", get label() { return t("SettingsWindow.Menus.stageBackdrop"); }, icon: "fa-solid fa-image" }
     ],
     sections: [
-      { title: "무대", keys: ["stageSlots", "stageInset", "stageTypewriter", "stageNarration", "stageHideHud", "stageShow"] },
-      { title: "등장·퇴장 시간", keys: ["stageHold", "stageDim", "stageLeave", "stageLineSeconds", "stageFaceSeconds"] },
-      { title: "RP 모드를 켤 때", keys: ["stagePause", "stageHidePause", "stagePickBg", "stageLockView"] },
-      { title: "말하는 캐릭터·발언권", keys: ["speakerBar", "stageOwnedCast", "stageVoice"] }
+      { get title() { return t("SettingsWindow.Sections.stage"); }, keys: ["stageSlots", "stageInset", "stageTypewriter", "stageNarration", "stageHideHud", "stageShow"] },
+      { get title() { return t("SettingsWindow.Sections.timing"); }, keys: ["stageHold", "stageDim", "stageLeave", "stageLineSeconds", "stageFaceSeconds"] },
+      { get title() { return t("SettingsWindow.Sections.rpOn"); }, keys: ["stagePause", "stageHidePause", "stagePickBg", "stageLockView"] },
+      { get title() { return t("SettingsWindow.Sections.speakers"); }, keys: ["speakerBar", "stageOwnedCast", "stageVoice"] }
     ]
   },
   {
-    id: "landing", label: "랜딩 페이지", icon: "fa-solid fa-door-open",
-    menus: [{ key: "landingEditor", label: "랜딩 페이지 꾸미기", icon: "fa-solid fa-wand-magic-sparkles" }],
+    id: "landing", get label() { return t("SettingsWindow.Tabs.landing"); }, icon: "fa-solid fa-door-open",
+    menus: [{ key: "landingEditor", get label() { return t("SettingsWindow.Menus.landingEditor"); }, icon: "fa-solid fa-wand-magic-sparkles" }],
     sections: [
-      { title: "표시", keys: ["landingShow", "landingMotion"] }
+      { get title() { return t("SettingsWindow.Sections.display"); }, keys: ["landingShow", "landingMotion"] }
     ]
   }
+  // @end-plus
 ];
 
-const OTHER_TAB = { id: "other", label: "기타", icon: "fa-solid fa-ellipsis", sections: [{ title: "기타", keys: [] }] };
+const OTHER_TAB = { id: "other", get label() { return t("SettingsWindow.Tabs.other"); }, icon: "fa-solid fa-ellipsis", sections: [{ get title() { return t("SettingsWindow.Tabs.other"); }, keys: [] }] };
 
 /** Menus that now open from inside the window instead of the main list. */
 const capturedMenus = new Map();
@@ -77,9 +84,10 @@ function fieldHtml(key, context = []) {
   const cfg = config(key);
   if (!editable(cfg)) return "";
   const value = game.settings.get(MODULE_ID, key);
-  const name = esc(shortName(String(cfg.name ?? key), context));
-  const hint = cfg.hint ? `<p class="hint">${esc(cfg.hint)}</p>` : "";
-  const world = cfg.scope === "world" ? `<span class="scope" data-tooltip="월드 설정 — 모두에게 적용">월드</span>` : "";
+  // Names and hints are registered as i18n keys.
+  const name = esc(shortName(game.i18n.localize(String(cfg.name ?? key)), context));
+  const hint = cfg.hint ? `<p class="hint">${esc(game.i18n.localize(String(cfg.hint)))}</p>` : "";
+  const world = cfg.scope === "world" ? `<span class="scope" data-tooltip="${esc(t("SettingsWindow.WorldTip"))}">${esc(t("SettingsWindow.World"))}</span>` : "";
   let input;
   if (cfg.type === Boolean) {
     return `<div class="rcs-set-field check"><label><input type="checkbox" data-key="${key}" ${value ? "checked" : ""}><span>${name}</span>${world}</label>${hint}</div>`;
@@ -105,7 +113,7 @@ export class RcsSettingsWindow extends foundry.applications.api.ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "rcs-settings",
     classes: ["rcs-settings"],
-    window: { title: "Rutz's Cinematic Stage 설정", icon: "fa-solid fa-sliders", resizable: true },
+    window: { title: k("SettingsWindow.Title"), icon: "fa-solid fa-sliders", resizable: true },
     position: { width: 760, height: 640 }
   };
 
@@ -152,14 +160,14 @@ export class RcsSettingsWindow extends foundry.applications.api.ApplicationV2 {
         <nav class="rcs-set-tabs">${nav}</nav>
         <div class="rcs-set-body">
           ${menus ? `<div class="rcs-set-menus">${menus}</div>` : ""}
-          ${sections || `<p class="hint">이 항목에서 바꿀 수 있는 설정이 없습니다.</p>`}
+          ${sections || `<p class="hint">${t("SettingsWindow.Empty")}</p>`}
         </div>
       </div>
       <footer class="rcs-set-footer">
-        <button type="button" data-act="defaults"><i class="fa-solid fa-rotate-left"></i> 이 항목 기본값으로</button>
+        <button type="button" data-act="defaults"><i class="fa-solid fa-rotate-left"></i> ${t("SettingsWindow.Defaults")}</button>
         <span class="grow"></span>
-        <button type="button" data-act="close">닫기</button>
-        <button type="button" data-act="save" class="primary"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+        <button type="button" data-act="close">${t("Common.Close")}</button>
+        <button type="button" data-act="save" class="primary"><i class="fa-solid fa-floppy-disk"></i> ${t("Common.Save")}</button>
       </footer>`;
   }
 
@@ -251,7 +259,7 @@ export class RcsSettingsWindow extends foundry.applications.api.ApplicationV2 {
       if (cfg.requiresReload) { reload = true; world ||= cfg.scope === "world"; }
     }
     this.changed.clear();
-    ui.notifications.info("설정을 저장했습니다.");
+    ui.notifications.info(t("SettingsWindow.Saved"));
     this.close();
     const SC = foundry.applications?.settings?.SettingsConfig ?? globalThis.SettingsConfig;
     if (reload && typeof SC?.reloadConfirm === "function") SC.reloadConfirm({ world });
@@ -287,8 +295,8 @@ export function registerSettingsWindows() {
   for (const tab of all) {
     const Opener = class extends RcsSettingsWindow { static TAB = tab.id; };
     game.settings.registerMenu(MODULE_ID, `settings-${tab.id}`, {
-      name: `${tab.label} 설정`,
-      label: `${tab.label} 상세 설정`,
+      name: t("SettingsWindow.MenuName", { tab: tab.label }),
+      label: t("SettingsWindow.MenuLabel", { tab: tab.label }),
       icon: tab.icon,
       type: Opener,
       restricted: !!tab.gm

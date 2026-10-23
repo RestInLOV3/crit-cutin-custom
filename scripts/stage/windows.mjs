@@ -4,6 +4,7 @@ import { SIZE_LABELS, analyzeMedia, placeFigure, sizeOf } from "./figure.mjs";
 import { setStageActive, stageActive } from "./stage.mjs";
 import { openBackgroundPicker } from "./backgrounds.mjs";
 import { currentSpeaker } from "./speakers.mjs";
+import { k, t } from "../i18n.mjs";
 
 /* ======================================================================== *
  * GM: speaking rights — which characters each player may speak as on stage,
@@ -21,7 +22,7 @@ const PLAYER_LIMIT = 6;
 function filePicker(type, current, callback) {
   const FP = foundry.applications?.apps?.FilePicker?.implementation ?? globalThis.FilePicker;
   try { new FP({ type, current, callback }).render(true); }
-  catch (_) { ui.notifications.warn("파일 선택 창을 열 권한이 없습니다. 경로를 직접 붙여 넣으세요."); }
+  catch (_) { ui.notifications.warn(t("Common.NoFilePickerPaste")); }
 }
 
 let castWindow = null;
@@ -36,7 +37,7 @@ export class CastWindow extends AppV2 {
   static DEFAULT_OPTIONS = {
     id: "rcs-cast-window",
     classes: ["rcs-cast-window"],
-    window: { title: "RP 무대 — 발언권", icon: "fa-solid fa-users-rectangle", resizable: true },
+    window: { title: k("Cast.Title"), icon: "fa-solid fa-users-rectangle", resizable: true },
     position: { width: 640, height: "auto" }
   };
 
@@ -61,15 +62,15 @@ export class CastWindow extends AppV2 {
     const chip = (id, removable, userId) => {
       const a = game.actors.get(id);
       return `<span class="rcs-cw-chip ${removable ? "" : "fixed"}"><img src="${esc(stageLook(id).thumb)}" alt=""><span>${esc(a.name)}</span>
-        <button type="button" data-act="look" data-actor="${id}" data-tooltip="무대 그림·표정"><i class="fa-solid fa-sliders"></i></button>
-        ${removable ? `<button type="button" data-act="remove" data-user="${userId}" data-actor="${id}" data-tooltip="빼기"><i class="fa-solid fa-xmark"></i></button>` : ""}</span>`;
+        <button type="button" data-act="look" data-actor="${id}" data-tooltip="${esc(t("Cast.LookTip"))}"><i class="fa-solid fa-sliders"></i></button>
+        ${removable ? `<button type="button" data-act="remove" data-user="${userId}" data-actor="${id}" data-tooltip="${esc(t("Cast.Remove"))}"><i class="fa-solid fa-xmark"></i></button>` : ""}</span>`;
     };
     const userRow = user => {
       const ids = (cast[user.id] ?? []).filter(id => game.actors.get(id));
       const mine = owned ? actors.filter(a => a.type !== "loot" && a.testUserPermission(user, "OWNER") && !ids.includes(a.id)).slice(0, 6) : [];
       const full = ids.length >= PLAYER_LIMIT;
       const others = actors.filter(a => !ids.includes(a.id) && !mine.includes(a));
-      const add = full ? `<em class="hint">최대 ${PLAYER_LIMIT}명</em>` : `<select data-add="${user.id}"><option value="">+ 맡길 캐릭터…</option>
+      const add = full ? `<em class="hint">${t("Cast.Max", { n: PLAYER_LIMIT })}</em>` : `<select data-add="${user.id}"><option value="">${esc(t("Cast.AddPlaceholder"))}</option>
         ${others.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join("")}</select>`;
       return `<div class="rcs-cw-user" data-user="${user.id}">
         <div class="who"><i style="background:${esc(user.color?.css ?? user.color ?? "#888")}"></i><span>${esc(user.name)}</span></div>
@@ -77,18 +78,16 @@ export class CastWindow extends AppV2 {
     };
     return `<div class="rcs-cw">
       <div class="rcs-cw-mode ${on ? "on" : ""}">
-        <div class="state"><b>${on ? "진지 RP 모드 켜짐" : "평소 모드"}</b><br><span class="hint">${on ? "입력을 시작하면 그 캐릭터가 무대에 오릅니다." : "켜면 모두의 화면에 RP 무대가 열립니다."}</span></div>
-        <button type="button" data-act="bg"><i class="fa-solid fa-image"></i> 배경</button>
-        <button type="button" data-act="toggle"><i class="fa-solid ${on ? "fa-stop" : "fa-play"}"></i> ${on ? "평소 모드로" : "진지 RP 모드 켜기"}</button>
+        <div class="state"><b>${on ? t("Cast.On") : t("Cast.Normal")}</b><br><span class="hint">${on ? t("Cast.OnHint") : t("Cast.OffHint")}</span></div>
+        <button type="button" data-act="bg"><i class="fa-solid fa-image"></i> ${t("Cast.Backdrop")}</button>
+        <button type="button" data-act="toggle"><i class="fa-solid ${on ? "fa-stop" : "fa-play"}"></i> ${on ? t("Cast.BackToNormal") : t("Stage.TurnOn")}</button>
       </div>
       <div class="rcs-cw-row">
-        <label>한 번에 서는 인원 <select data-setting="stageSlots">${[3, 4, 5].map(n => `<option value="${n}" ${Number(setting("stageSlots", 3)) === n ? "selected" : ""}>${n}명</option>`).join("")}</select></label>
+        <label>${t("Cast.Slots")} <select data-setting="stageSlots">${[3, 4, 5].map(n => `<option value="${n}" ${Number(setting("stageSlots", 3)) === n ? "selected" : ""}>${t("Cast.People", { n })}</option>`).join("")}</select></label>
       </div>
-      <h3>플레이어 — 누구로 말할 수 있나</h3>
-      <p class="hint">${owned ? "흐린 칸은 그 플레이어가 소유한 캐릭터로, 자동으로 말할 수 있습니다. " : ""}그 밖에 NPC 등을 맡기려면 여기서 넣으세요(소유권은 그대로).
-        사이드바의 액터를 줄 위로 끌어다 놓아도 됩니다. 플레이어는 채팅창 위 <b>말하는 캐릭터 바</b>에서 고릅니다.<br>
-        GM은 따로 정할 필요가 없습니다: Alt+토큰 클릭이나 바의 + 로 아무 캐릭터나 바에 올리세요.</p>
-      <div class="rcs-cw-users">${users.map(userRow).join("") || `<p class="hint">접속한 플레이어가 없습니다.</p>`}</div>
+      <h3>${t("Cast.Players")}</h3>
+      <p class="hint">${owned ? `${t("Cast.OwnedNote")} ` : ""}${t("Cast.Help")}</p>
+      <div class="rcs-cw-users">${users.map(userRow).join("") || `<p class="hint">${t("Cast.NoPlayers")}</p>`}</div>
     </div>`;
   }
 
@@ -130,7 +129,7 @@ export class CastWindow extends AppV2 {
     const cast = foundry.utils.deepClone(castMap());
     const list = (cast[userId] ?? []).filter(id => game.actors.get(id));
     if (list.includes(actorId)) return;
-    if (list.length >= PLAYER_LIMIT) return ui.notifications.warn(`한 플레이어에게 ${PLAYER_LIMIT}명까지 맡길 수 있습니다.`);
+    if (list.length >= PLAYER_LIMIT) return ui.notifications.warn(t("Cast.Limit", { n: PLAYER_LIMIT }));
     cast[userId] = [...list, actorId];
     return this._setCast(cast);
   }
@@ -164,13 +163,13 @@ const looks = new Map();
 export function openMyStageLook() {
   const key = currentSpeaker()?.key;
   const actor = (key && game.actors.get(key.split("@")[0])) ?? game.user.character;
-  if (!actor) return ui.notifications.info("말하는 캐릭터 바에서 캐릭터를 고르거나 토큰을 선택한 뒤 여세요.");
+  if (!actor) return ui.notifications.info(t("Look.PickFirst"));
   return openStageLook(actor);
 }
 
 export function openStageLook(actor) {
   if (!actor) return;
-  if (!actor.isOwner) return ui.notifications.warn("이 캐릭터의 무대 설정을 바꿀 권한이 없습니다.");
+  if (!actor.isOwner) return ui.notifications.warn(t("Look.NotOwner"));
   const open = looks.get(actor.id);
   if (open?.rendered) { open.bringToFront?.(); return open; }
   const app = new StageLookWindow(actor);
@@ -186,7 +185,7 @@ export class StageLookWindow extends AppV2 {
   };
 
   constructor(actor) {
-    super({ id: `rcs-look-${actor.id}`, window: { title: `RP 무대 — ${actor.name}` } });
+    super({ id: `rcs-look-${actor.id}`, window: { title: t("Look.Title", { name: actor.name }) } });
     this.actor = actor;
     const cfg = actor.getFlag(MODULE_ID, STAGE_FLAG) ?? {};
     const hud = actor.getFlag("pf2e-kr-hud", "faces") ?? [];
@@ -211,32 +210,32 @@ export class StageLookWindow extends AppV2 {
     const opt = (value, label, current) => `<option value="${value}" ${current === value ? "selected" : ""}>${label}</option>`;
     const faces = d.faces.map((f, i) => `<div class="rcs-aw-face" data-i="${i}">
       <img src="${esc(f.img || "icons/svg/mystery-man.svg")}" alt="">
-      <input type="text" data-face-key="${i}" value="${esc(f.key)}" placeholder="키워드">
-      <input type="text" data-face-img="${i}" value="${esc(f.img)}" placeholder="그림 경로">
-      <button type="button" data-face-pick="${i}" data-tooltip="그림 고르기"><i class="fa-solid fa-image"></i></button>
-      <button type="button" data-face-show="${i}" data-tooltip="미리보기"><i class="fa-solid fa-eye"></i></button>
-      <button type="button" data-face-del="${i}" data-tooltip="지우기"><i class="fa-solid fa-trash"></i></button></div>`).join("");
+      <input type="text" data-face-key="${i}" value="${esc(f.key)}" placeholder="${esc(t("Look.Keyword"))}">
+      <input type="text" data-face-img="${i}" value="${esc(f.img)}" placeholder="${esc(t("Look.PicturePath"))}">
+      <button type="button" data-face-pick="${i}" data-tooltip="${esc(t("Look.ChoosePicture"))}"><i class="fa-solid fa-image"></i></button>
+      <button type="button" data-face-show="${i}" data-tooltip="${esc(t("Look.Preview"))}"><i class="fa-solid fa-eye"></i></button>
+      <button type="button" data-face-del="${i}" data-tooltip="${esc(t("Common.Delete"))}"><i class="fa-solid fa-trash"></i></button></div>`).join("");
     return `
       <div class="rcs-aw-left">
-        <div class="rcs-aw-preview"><div class="ref" data-tooltip="중간 크기 캐릭터의 머리 높이"></div><img class="rcs-layer on" alt=""><div class="box"></div></div>
+        <div class="rcs-aw-preview"><div class="ref" data-tooltip="${esc(t("Look.RefTip"))}"></div><img class="rcs-layer on" alt=""><div class="box"></div></div>
         <p class="hint detected"></p>
       </div>
       <div class="rcs-aw-fields">
-        <div class="field">무대 그림
-          <div class="pick"><input type="text" name="image" value="${esc(d.image)}" placeholder="비우면 캐릭터 초상화"><button type="button" data-pick="image"><i class="fa-solid fa-image"></i></button></div></div>
+        <div class="field">${t("Look.Picture")}
+          <div class="pick"><input type="text" name="image" value="${esc(d.image)}" placeholder="${esc(t("Common.EmptyPortrait"))}"><button type="button" data-pick="image"><i class="fa-solid fa-image"></i></button></div></div>
         <div class="row2">
-          <label class="field">덩치 <select name="size">${opt("auto", `자동 (${SIZE_LABELS[auto]})`, d.size)}${Object.entries(SIZE_LABELS).map(([k, l]) => opt(k, l, d.size)).join("")}</select></label>
-          <label class="field">그림 종류 <select name="framing">${opt("auto", "자동", d.framing)}${opt("full", "전신 (발까지)", d.framing)}${opt("half", "상반신·잘린 그림", d.framing)}</select></label>
+          <label class="field">${t("Look.Size")} <select name="size">${opt("auto", esc(t("Look.AutoSize", { size: SIZE_LABELS[auto] })), d.size)}${Object.entries(SIZE_LABELS).map(([k, l]) => opt(k, l, d.size)).join("")}</select></label>
+          <label class="field">${t("Look.Framing")} <select name="framing">${opt("auto", esc(t("Common.Auto")), d.framing)}${opt("full", esc(t("Look.Full")), d.framing)}${opt("half", esc(t("Look.Half")), d.framing)}</select></label>
         </div>
-        <div class="field">크기 보정<div class="slider"><input type="range" name="scale" min="0.4" max="2" step="0.01" value="${d.scale}"><output>${d.scale.toFixed(2)}×</output></div></div>
-        <div class="field">높이 (위로 +)<div class="slider"><input type="range" name="offsetY" min="-40" max="40" step="1" value="${d.offsetY}"><output>${d.offsetY}%</output></div></div>
-        <label class="field" style="flex-direction:row;align-items:center;gap:6px;font-weight:400"><input type="checkbox" name="flip" ${d.flip ? "checked" : ""}> 좌우 반전</label>
-        <div class="field">표정 <span class="hint" style="font-weight:400">대사에 "@키워드" → 몇 초 뒤 기본 얼굴로, "@@키워드" → 계속 유지. "@기본"은 원래 그림.</span></div>
-        <div class="rcs-aw-faces">${faces || `<p class="hint">아직 표정이 없습니다.</p>`}</div>
-        <div class="row"><button type="button" data-act="add-face"><i class="fa-solid fa-plus"></i> 표정 추가</button></div>
+        <div class="field">${t("Look.Scale")}<div class="slider"><input type="range" name="scale" min="0.4" max="2" step="0.01" value="${d.scale}"><output>${d.scale.toFixed(2)}×</output></div></div>
+        <div class="field">${t("Look.Height")}<div class="slider"><input type="range" name="offsetY" min="-40" max="40" step="1" value="${d.offsetY}"><output>${d.offsetY}%</output></div></div>
+        <label class="field" style="flex-direction:row;align-items:center;gap:6px;font-weight:400"><input type="checkbox" name="flip" ${d.flip ? "checked" : ""}> ${t("Common.Flip")}</label>
+        <div class="field">${t("Look.Faces")} <span class="hint" style="font-weight:400">${t("Look.FacesHint")}</span></div>
+        <div class="rcs-aw-faces">${faces || `<p class="hint">${t("Look.NoFaces")}</p>`}</div>
+        <div class="row"><button type="button" data-act="add-face"><i class="fa-solid fa-plus"></i> ${t("Look.AddFace")}</button></div>
       </div>
-      <div class="rcs-aw-foot"><button type="button" data-act="reset">기본값으로</button><span class="grow"></span>
-        <button type="button" data-act="close">닫기</button><button type="button" data-act="save"><i class="fa-solid fa-floppy-disk"></i> 저장</button></div>`;
+      <div class="rcs-aw-foot"><button type="button" data-act="reset">${t("Look.Reset")}</button><span class="grow"></span>
+        <button type="button" data-act="close">${t("Common.Close")}</button><button type="button" data-act="save"><i class="fa-solid fa-floppy-disk"></i> ${t("Common.Save")}</button></div>`;
   }
 
   _replaceHTML(result, content) {
@@ -280,7 +279,7 @@ export class StageLookWindow extends AppV2 {
     const ref = placeFigure({ W, H, n: 3, index: 1, meta: { w: 1, h: 1, x0: 0, y0: 0, x1: 1, y1: 1, cut: false }, size: "med", framing: "full" });
     box.querySelector(".ref").style.bottom = `${ref.bottom + ref.height}px`;
     const hint = this.element.querySelector(".detected");
-    if (hint) hint.textContent = `자동 판단: ${this.meta.cut ? "상반신·잘린 그림 (아래를 대사창 뒤로 숨김)" : "전신 (발이 대사창 바로 뒤)"}${this.meta.measured ? "" : " · 다른 사이트의 그림이라 여백을 잴 수 없음"}. 점선은 중간 크기 캐릭터의 머리 높이입니다.`;
+    if (hint) hint.textContent = t("Look.Detected", { kind: this.meta.cut ? t("Look.DetectedCut") : t("Look.DetectedFull"), note: this.meta.measured ? "" : ` · ${t("Look.NotMeasured")}` });
   }
 
   _preview() {
@@ -311,20 +310,20 @@ export class StageLookWindow extends AppV2 {
   }
 
   async _onClick(ev) {
-    const t = ev.target.closest("button");
-    if (!t) return;
+    const btn = ev.target.closest("button");
+    if (!btn) return;
     const d = this.draft;
-    if (t.dataset.pick) {
+    if (btn.dataset.pick) {
       const input = this.element.querySelector('input[name="image"]');
       return filePicker("imagevideo", input.value, path => { input.value = path; input.dispatchEvent(new Event("change", { bubbles: true })); });
     }
-    if (t.dataset.facePick !== undefined) {
-      const input = this.element.querySelector(`[data-face-img="${t.dataset.facePick}"]`);
+    if (btn.dataset.facePick !== undefined) {
+      const input = this.element.querySelector(`[data-face-img="${btn.dataset.facePick}"]`);
       return filePicker("image", input.value, path => { input.value = path; input.dispatchEvent(new Event("change", { bubbles: true })); });
     }
-    if (t.dataset.faceShow !== undefined) { this.previewFace = Number(t.dataset.faceShow); return this._preview(); }
-    if (t.dataset.faceDel !== undefined) { d.faces.splice(Number(t.dataset.faceDel), 1); this.previewFace = null; return this.render(); }
-    const act = t.dataset.act;
+    if (btn.dataset.faceShow !== undefined) { this.previewFace = Number(btn.dataset.faceShow); return this._preview(); }
+    if (btn.dataset.faceDel !== undefined) { d.faces.splice(Number(btn.dataset.faceDel), 1); this.previewFace = null; return this.render(); }
+    const act = btn.dataset.act;
     if (act === "add-face") { d.faces.push({ key: "", img: "" }); return this.render(); }
     if (act === "reset") { this.draft = { image: "", flip: false, scale: 1, offsetY: 0, framing: "auto", size: "auto", faces: d.faces }; return this.render(); }
     if (act === "close") return this.close();
@@ -333,7 +332,7 @@ export class StageLookWindow extends AppV2 {
       await this.actor.setFlag(MODULE_ID, STAGE_FLAG, {
         image: d.image, flip: d.flip, scale: d.scale, offsetY: d.offsetY, framing: d.framing, size: d.size === "auto" ? "" : d.size, faces
       });
-      ui.notifications.info(`${this.actor.name}의 무대 설정을 저장했습니다.`);
+      ui.notifications.info(t("Look.Saved", { name: this.actor.name }));
       game.rutzCutin?.stage?.render();
       game.rutzCutin?.stage?.bar?.render();
       return this.close();

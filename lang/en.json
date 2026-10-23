@@ -1,0 +1,629 @@
+{
+  "RCC": {
+    "Common": {
+      "Save": "Save",
+      "Close": "Close",
+      "On": "On",
+      "Off": "Off",
+      "Auto": "Auto",
+      "None": "None",
+      "Delete": "Delete",
+      "Flip": "Flip horizontally",
+      "ChooseFile": "Choose file",
+      "Optional": "(optional)",
+      "EmptyPortrait": "Empty: character portrait",
+      "NoFilePicker": "You don't have permission to open the file picker.",
+      "NoFilePickerPaste": "You don't have permission to open the file picker. Paste the path instead."
+    },
+    "Settings": {
+      "enabled": {
+        "Name": "Enable critical cut-ins"
+      },
+      "trigger": {
+        "Name": "When to play",
+        "Hint": "In PF2e, “Critical Success” is the degree of success (beating the DC by 10 counts), and “Natural 20” is the die face. Other systems go by the natural 20.",
+        "Choices": {
+          "both": "Natural 20 or Critical Success",
+          "nat20": "Natural 20 only",
+          "crit": "Critical Success only"
+        }
+      },
+      "groupSkill": {
+        "Name": "Also on skill and Perception checks",
+        "Hint": "Attack rolls are always included."
+      },
+      "groupSave": {
+        "Name": "Also on saving throws"
+      },
+      "groupFlat": {
+        "Name": "Also on flat checks and initiative"
+      },
+      "npc": {
+        "Name": "Also for NPCs",
+        "Hint": "Also play cut-ins for criticals by characters no player owns."
+      },
+      "defaultTemplate": {
+        "Name": "Default template",
+        "Hint": "Used when a character has no template of its own."
+      },
+      "defaultTitle": {
+        "Name": "Default headline"
+      },
+      "badgeText": {
+        "Name": "Natural 20 tag",
+        "Hint": "The small line above the headline on a natural 20. Leave it empty to show none. Each character can change or hide it in the editor."
+      },
+      "soundPreset": {
+        "Name": "Default sound",
+        "Hint": "Sounds 1–5 are synthesized by the module on the spot (no audio files). Choose “File” to use the file below."
+      },
+      "defaultSound": {
+        "Name": "Default sound file",
+        "Hint": "Played when “File” is chosen above."
+      },
+      "fumbleEnabled": {
+        "Name": "Enable fumble cut-ins",
+        "Hint": "Also play a cut-in on a Critical Failure (or natural 1): the same template and picture in cold, faded colors, with a cracking screen and falling letters. Roll types and the NPC option follow the critical settings above."
+      },
+      "fumbleTrigger": {
+        "Name": "Fumble — when to play",
+        "Hint": "In PF2e, “Critical Failure” is the degree of success (missing the DC by 10 counts), and “Natural 1” is the die face.",
+        "Choices": {
+          "both": "Natural 1 or Critical Failure",
+          "nat1": "Natural 1 only",
+          "critfail": "Critical Failure only"
+        }
+      },
+      "fumbleTitle": {
+        "Name": "Fumble headline"
+      },
+      "fumbleBadge": {
+        "Name": "Natural 1 tag",
+        "Hint": "The small line shown on a natural 1. Leave it empty to show none."
+      },
+      "fumbleSound": {
+        "Name": "Default fumble sound",
+        "Hint": "Fail sounds 1–3 are synthesized by the module too."
+      },
+      "fumbleSoundFile": {
+        "Name": "Fumble sound file"
+      },
+      "show": {
+        "Name": "Cut-ins on my screen",
+        "Choices": {
+          "full": "On",
+          "reduced": "Reduced motion (fade only)",
+          "off": "Off"
+        }
+      },
+      "duration": {
+        "Name": "Cut-in length (seconds)"
+      },
+      "volume": {
+        "Name": "Cut-in volume",
+        "Hint": "Multiplied by Foundry's interface volume."
+      },
+      "waitDice": {
+        "Name": "Play after Dice So Nice dice settle"
+      },
+      "landingShow": {
+        "Name": "Landing Page: Show on my screen",
+        "Hint": "When off, you see the map right away, even on a landing scene."
+      },
+      "landingMotion": {
+        "Name": "Landing Page: Motion",
+        "Hint": "Light rays, fog, embers and the slow push-in on the background. “Reduced” shows a still picture only.",
+        "Choices": {
+          "full": "On",
+          "reduced": "Reduced"
+        }
+      },
+      "stageSlots": {
+        "Name": "RP Stage: Characters on stage at once",
+        "Hint": "5 is recommended on wide screens only: the spots get narrower, pictures get smaller, and wide art (wings and the like) overlaps the next spot.",
+        "Choices": {
+          "3": "3",
+          "4": "4 (large screen)",
+          "5": "5 (very wide screen)"
+        }
+      },
+      "stageInset": {
+        "Name": "RP Stage: Screen margin (%)",
+        "Hint": "At 0 the whole screen is the stage. Otherwise the stage becomes a “scene window”, shrunk by that much on every side, with the darkened battle map around it. 5–8 recommended."
+      },
+      "stageHold": {
+        "Name": "RP Stage: Hold the floor (seconds)",
+        "Hint": "For this long after speaking, a character can't be pushed off by a newcomer. While typing, their spot is always kept."
+      },
+      "stageDim": {
+        "Name": "RP Stage: Gray out after (seconds)"
+      },
+      "stageLeave": {
+        "Name": "RP Stage: Exit on their own after (seconds)",
+        "Hint": "A character silent this long leaves the stage even if no one new speaks. At 0 they stay until their spot is needed."
+      },
+      "stageFaceSeconds": {
+        "Name": "RP Stage: Expression duration (seconds)",
+        "Hint": "“@smile” in a line goes back to the default face after this long (a little longer for long lines). “@@smile” stays until changed."
+      },
+      "stageNarration": {
+        "Name": "RP Stage: GM narration",
+        "Hint": "Lines written with the speaker bar's 🪶 (narration) appear in the dialogue box as narration, without a name plate."
+      },
+      "stageLineSeconds": {
+        "Name": "RP Stage: Line fades after (seconds)",
+        "Hint": "The last line leaves the dialogue box after this long. At 0 it stays until the next line."
+      },
+      "stageVoice": {
+        "Name": "RP Stage: Enter on voice (Discord) too",
+        "Hint": "With a Discord voice bridge, whoever talks brings their character on stage (the one pinned on the bar, else their assigned character), just like typing. Also toggled with the bar's 🎙 button."
+      },
+      "stageOwnedCast": {
+        "Name": "RP Stage: Players can speak as characters they own",
+        "Hint": "When off, players can only speak as the characters the GM gives them under “Speaking Rights”."
+      },
+      "stageTypewriter": {
+        "Name": "RP Stage: Typewriter effect",
+        "Hint": "Lines appear letter by letter (about 40 a second). When off, they appear all at once."
+      },
+      "stagePause": {
+        "Name": "Pause the game during RP mode",
+        "Hint": "Pauses when RP mode turns on and unpauses when it turns off (a game that was already paused stays paused)."
+      },
+      "stageHidePause": {
+        "Name": "Hide the pause indicator during RP mode",
+        "Hint": "Hides the pause image and text in the middle of the screen (Alternative Pause Text included) and leaves only a small ⏸ in a corner of the stage."
+      },
+      "stagePickBg": {
+        "Name": "Open the backdrop picker when RP mode turns on"
+      },
+      "stageLockView": {
+        "Name": "Lock players' view while a backdrop covers the map",
+        "Hint": "While an RP backdrop is up, players can't pan or zoom the map or hover over tokens."
+      },
+      "stageHideHud": {
+        "Name": "Hide party portraits and the turn tracker during the RP stage"
+      },
+      "stageShow": {
+        "Name": "Show the RP stage on my screen"
+      },
+      "speakerBar": {
+        "Name": "Speaker bar",
+        "Hint": "A row of faces above the chat box. Click one to keep speaking as that character (clicking other tokens won't change it). Auto: shown to the GM in RP mode or when someone is on the bar, and to players with more than one character.",
+        "Choices": {
+          "auto": "Auto",
+          "always": "Always",
+          "off": "Off (Foundry default)"
+        }
+      }
+    },
+    "Menus": {
+      "editor": {
+        "Name": "Per-character cut-ins",
+        "Label": "Open cut-in editor",
+        "Hint": "Set each character's picture, position, zoom, colors, line and sound. Also opens from the ⚡ button at the top of the character sheet."
+      },
+      "landingEditor": {
+        "Name": "Landing Page",
+        "Label": "Design landing page",
+        "Hint": "Dress up the scene you are viewing as the campaign's title screen."
+      },
+      "stageCast": {
+        "Name": "Serious RP Stage — Speaking Rights",
+        "Label": "Open speaking rights",
+        "Hint": "Turn serious RP mode on and off, and let players speak as characters they don't own (NPCs and others). Also in the “Rutz Toolkit” tab on the left."
+      },
+      "stageBackdrop": {
+        "Name": "Serious RP Stage — Backdrop",
+        "Label": "Choose backdrop",
+        "Hint": "Keep backdrop pictures in folders and pick one. Also opens when RP mode turns on."
+      }
+    },
+    "Keybindings": {
+      "stageToggle": "Toggle serious RP mode (GM)"
+    },
+    "Sheet": {
+      "Button": "Cut-in",
+      "Control": "Critical Cut-in"
+    },
+    "Controls": {
+      "Menu": "Cinematic Stage — RP stage · landing page"
+    },
+    "SettingsWindow": {
+      "Title": "Rutz's Cinematic Stage Settings",
+      "Tabs": {
+        "cutin": "Critical Cut-ins",
+        "stage": "Serious RP Stage",
+        "landing": "Landing Page",
+        "other": "Other"
+      },
+      "Menus": {
+        "editor": "Per-character cut-in editor",
+        "stageBackdrop": "Choose backdrop",
+        "landingEditor": "Design landing page"
+      },
+      "Sections": {
+        "when": "When to play",
+        "look": "Default look & sound",
+        "fumble": "Fumble cut-ins",
+        "screen": "My screen",
+        "stage": "Stage",
+        "timing": "Entrances & exits",
+        "rpOn": "When RP mode turns on",
+        "speakers": "Speakers & speaking rights",
+        "display": "Display"
+      },
+      "WorldTip": "World setting — applies to everyone",
+      "World": "World",
+      "Empty": "Nothing here you can change.",
+      "Defaults": "Reset this section",
+      "Saved": "Settings saved.",
+      "MenuName": "{tab} Settings",
+      "MenuLabel": "Configure {tab}"
+    },
+    "Menu": {
+      "Title": "Cinematic Stage",
+      "Look": "Stage picture & expressions (current speaker)",
+      "LandingEdit": "Design this scene's landing page",
+      "LandingMake": "Make this scene a landing page",
+      "LandingShow": "Show the landing page again",
+      "Settings": "Settings"
+    },
+    "Editor": {
+      "NoFilePicker": "You don't have permission to open the file picker. Paste a file path, or ask the GM to upload the file.",
+      "WorldDefault": "World default ({label})",
+      "NoActor": "Couldn't find a character to edit the cut-in for.",
+      "NotOwner": "You can only edit characters you own.",
+      "Title": "Critical Cut-in — {name}",
+      "PreviewAria": "Preview — drag to move, scroll to zoom",
+      "DragHint": "<b>Drag</b> the picture to position it and <b>scroll</b> to zoom. Position and zoom are saved <b>for the chosen template only</b>.",
+      "Crit": "Critical",
+      "Fumble": "Fumble",
+      "PlayHere": "Play here",
+      "PlayFull": "Play full screen",
+      "BroadcastTip": "Shows it once to everyone connected, exactly as it is now (unsaved)",
+      "Broadcast": "Play for everyone",
+      "ResetCropTip": "Reset this template's position and zoom",
+      "ResetCrop": "Reset position",
+      "Enabled": "Use critical cut-ins for this character",
+      "Template": "Template",
+      "Picture": "Picture",
+      "PictureNote": "(set each one with the Critical / Fumble switch at the bottom left)",
+      "FumbleImagePlaceholder": "Empty: use the critical picture",
+      "SameAsCrit": "Same as critical",
+      "Portrait": "Character portrait",
+      "TokenArt": "Token art",
+      "Crop": "Position & zoom",
+      "ThisTemplate": "(this template)",
+      "Colors": "Colors",
+      "Accent": "Accent",
+      "Base": "Base",
+      "ResetColors": "Template colors",
+      "Headline": "Headline",
+      "Quote": "Line",
+      "QuotePlaceholder": "e.g. This ends now!",
+      "Badge": "Natural 20 tag",
+      "BadgeOff": "(off in world settings)",
+      "HideBadge": "Hide",
+      "Sound": "Sound",
+      "ListenTip": "Listen to the chosen sound",
+      "Listen": "Listen",
+      "SoundPath": "Sound file path (ogg / mp3 / wav)",
+      "FumbleSection": "Fumble cut-in",
+      "FumbleSectionNote": "(same template, picture set above · cold faded colors, a cracking screen, falling letters)",
+      "FumbleEnabled": "Use fumble cut-ins for this character",
+      "FumbleQuotePlaceholder": "e.g. Uh… that wasn't the plan?",
+      "FumbleBadge": "Natural 1 tag",
+      "ListenFumbleTip": "Listen to the fumble sound",
+      "Defaults": "Reset all",
+      "Saved": "Saved {name}'s critical cut-in.",
+      "SaveFailed": "Couldn't save. Check that you own this character.",
+      "PickTitle": "Critical Cut-in — Choose a Character",
+      "PickNone": "No characters you can edit. Check that you own a character.",
+      "PickHint": "Choose a character to edit the cut-in for. The <i class=\"fa-solid fa-bolt\"></i> button at the top of the character sheet opens it too.",
+      "OffLabel": "Cut-ins off for this character"
+    },
+    "Sound": {
+      "Presets": {
+        "synth1": "Sound 1",
+        "synth2": "Sound 2",
+        "synth3": "Sound 3",
+        "synth4": "Sound 4",
+        "synth5": "Sound 5"
+      },
+      "Fumble": {
+        "fumble1": "Fail 1 — wah-wah-waaah (deflating horn)",
+        "fumble2": "Fail 2 — crash (something breaks)",
+        "fumble3": "Fail 3 — thud… wheee (falling)"
+      },
+      "File": "File",
+      "FileEllipsis": "File…",
+      "FilePath": "File (path below)",
+      "None": "No sound"
+    },
+    "Templates": {
+      "strike": {
+        "Label": "Strike — red slash · big letters",
+        "Hint": "A band slashing across the screen, halftone dots, a slanted portrait panel and letters that pop out."
+      },
+      "band": {
+        "Label": "Emblem — wide band · light sweep",
+        "Hint": "Black bars close in from above and below, the face slides into the band in the middle, then a gleam sweeps across."
+      },
+      "eyes": {
+        "Label": "Eyeline — close-up strip on the eyes",
+        "Hint": "A long, thin strip zoomed in on the eyes sweeps past. Line the position up with the eyes."
+      },
+      "simple": {
+        "Label": "Simple — portrait · golden letters",
+        "Hint": "The portrait rises from below and the letters glow. The calmest of the looks."
+      }
+    },
+    "Landing": {
+      "Templates": {
+        "cinematic": {
+          "Label": "Cinematic",
+          "Hint": "Letterbox bars, a slow push-in on the background, a big title low on the left"
+        },
+        "fantasy": {
+          "Label": "Dark Fantasy",
+          "Hint": "A dark gilded frame, a centered title and a column of buttons, portrait cards below"
+        },
+        "jrpg": {
+          "Label": "JRPG Title",
+          "Hint": "A bright logo, a menu on the right with a pointer, slanted party panels"
+        },
+        "silhouette": {
+          "Label": "Silhouette Party",
+          "Hint": "The party in a row in the dark — only the one under the mouse is lit"
+        },
+        "storybook": {
+          "Label": "Storybook",
+          "Hint": "Title and menu on a parchment page, portraits pinned up like photographs"
+        },
+        "neon": {
+          "Label": "Cyber Neon",
+          "Hint": "A neon grid floor in the dark, a terminal menu, holographic ID cards"
+        },
+        "dossier": {
+          "Label": "Classified Dossier",
+          "Hint": "A file folder on a desk, typewriter text and a red stamp, paper-clipped photos (great for CoC)"
+        },
+        "tarot": {
+          "Label": "Tarot & Stars",
+          "Hint": "Tarot cards fanned out under a starry sky, a menu marked with stars"
+        }
+      },
+      "Fonts": {
+        "default": "Look's default",
+        "serif": "Default serif",
+        "sans": "Default sans-serif",
+        "songmyung": "Song Myung — brush serif",
+        "gowunbatang": "Gowun Batang — soft serif",
+        "hahmlet": "Hahmlet — bold serif",
+        "nanummyeongjo": "Nanum Myeongjo",
+        "diphylleia": "Diphylleia — elegant",
+        "blackhansans": "Black Han Sans — extra bold",
+        "dohyeon": "Do Hyeon — angular sans",
+        "jua": "Jua — rounded",
+        "gowundodum": "Gowun Dodum",
+        "orbit": "Orbit — sci-fi",
+        "nanumpen": "Nanum Pen Script",
+        "gaegu": "Gaegu — handwriting",
+        "typewriter": "Typewriter (monospace)",
+        "cinzel": "Cinzel — Latin capitals (Korean in serif)"
+      },
+      "Actions": {
+        "enter": "Enter (close this screen)",
+        "sheet": "My character sheet",
+        "shop": "Shop — item browser",
+        "journal": "Open journal",
+        "scene": "Go to scene",
+        "url": "Web link (new tab)",
+        "macro": "Run macro",
+        "stage": "Turn on serious RP mode (GM)"
+      },
+      "Particles": {
+        "none": "None",
+        "embers": "Embers (rising)",
+        "dust": "Dust & glitter",
+        "snow": "Snow",
+        "petals": "Petals"
+      },
+      "Menu": {
+        "enter": "Enter",
+        "shop": "Shop",
+        "sheet": "My character"
+      },
+      "Design": "Design landing page",
+      "ShowAll": "Show again for everyone",
+      "EnterAll": "Send everyone in (closes it on every screen)",
+      "CloseMine": "Close on my screen only",
+      "NoCharacter": "You have no assigned character.",
+      "NoJournal": "Can't find the linked journal.",
+      "NoScene": "Can't find the linked scene.",
+      "NoMacro": "Can't find the linked macro."
+    },
+    "LandingEditor": {
+      "NoScene": "No scene is open.",
+      "Title": "Landing Page — {name}",
+      "Tabs": {
+        "basic": "Basics",
+        "type": "Type",
+        "menu": "Menu",
+        "cards": "Cards",
+        "light": "Lighting"
+      },
+      "PreviewHint": "The preview is the real page, scaled down. Saving updates it at once for everyone viewing this scene.",
+      "Enabled": "Use this scene as a landing page",
+      "Reset": "Start over",
+      "Look": "Look",
+      "TitleField": "Title",
+      "TitlePlaceholder": "Empty: scene name",
+      "Subtitle": "Small text above the title",
+      "SubtitlePlaceholder": "e.g. Pathfinder campaign",
+      "Tagline": "Line below the title",
+      "TaglinePlaceholder": "e.g. Episode 7 — Night of the Red Moon",
+      "Note": "Note at the bottom",
+      "NotePlaceholder": "e.g. Next session: Sun, Oct 20, 8:00 PM",
+      "Background": "Background",
+      "BgImage": "Picture / video",
+      "BgDark": "Darkness (light only, no picture)",
+      "BgMedia": "Background picture / video",
+      "BgPlaceholder": "Empty: this scene's background",
+      "Logo": "Logo picture instead of the title",
+      "LogoPlaceholder": "Empty: title text",
+      "Cover": "Covers",
+      "CoverBoard": "Map only (chat stays visible)",
+      "CoverAll": "Whole screen",
+      "Custom": "Custom",
+      "TitleFont": "Title font",
+      "BodyFont": "Body & button font",
+      "FontHint": "Fonts are fetched from Google Fonts the first time they're used (offline, the default font shows instead).",
+      "TitleColor": "Title color",
+      "TextColor": "Text color",
+      "AccentColor": "Accent color (lines, button borders, icons)",
+      "ColorHint": "With “Custom” off, the look's own color is used (e.g. the gold title of Dark Fantasy).",
+      "TargetPlaceholder": "Drop from the sidebar, or a UUID",
+      "IconTip": "Font Awesome icon name",
+      "ButtonText": "Button text",
+      "MoveUp": "Move up",
+      "MoveDown": "Move down",
+      "MenuHint": "Drop a journal, scene or macro from the sidebar onto a row to link it. Web links: Discord, wiki and other addresses.",
+      "NoButtons": "No buttons.",
+      "AddButton": "Add button",
+      "NewButton": "New button",
+      "ShowCards": "Show party profile cards",
+      "ShowLevel": "Show ancestry, class and level",
+      "ShowPlayer": "Show player names and online status",
+      "CardActors": "Characters on the cards",
+      "CardActorsHint": "Pick none for every player character. Clicking a card opens the sheet (if you may view it).",
+      "NoActors": "No characters.",
+      "Vignette": "Darken the edges (vignette)",
+      "Grade": "Tint with the accent color",
+      "Rays": "Light rays (slanting down from above)",
+      "Fog": "Low drifting fog",
+      "Flicker": "Soft candle-like flicker",
+      "Particles": "Floating particles",
+      "LightHint": "Drawn with CSS only, so it stays light. Players can set motion to “Reduced” in the settings.",
+      "Saved": "Saved the landing page of '{name}'.",
+      "SavedOff": "Saved (this scene's landing page is turned off)."
+    },
+    "Stage": {
+      "Aria": "RP stage",
+      "Paused": "Paused",
+      "Speaking": "speaking…",
+      "Typing": "typing…",
+      "RefMissing": "Can't find '{name}'.",
+      "RefNoPermission": "You don't have permission to view '{name}'.",
+      "ClickToOpen": "Click to open",
+      "TurnOn": "Turn on serious RP mode",
+      "TurnOff": "Turn off serious RP mode",
+      "PickBackground": "Choose RP backdrop",
+      "CastMenu": "Speaking rights — characters players can voice"
+    },
+    "Cast": {
+      "Title": "RP Stage — Speaking Rights",
+      "LookTip": "Stage picture & expressions",
+      "Remove": "Remove",
+      "Max": "Max {n}",
+      "AddPlaceholder": "+ Give a character…",
+      "On": "Serious RP mode is on",
+      "Normal": "Normal mode",
+      "OnHint": "Start typing and that character steps onto the stage.",
+      "OffHint": "Turning it on opens the RP stage on everyone's screen.",
+      "Backdrop": "Backdrop",
+      "BackToNormal": "Back to normal",
+      "Slots": "On stage at once",
+      "People": "{n}",
+      "Players": "Players — who they can speak as",
+      "OwnedNote": "Dimmed chips are characters that player owns and can speak as automatically.",
+      "Help": "To hand them an NPC or anyone else, add it here (ownership stays as it is). You can also drop an actor from the sidebar onto a row. Players choose on the <b>speaker bar</b> above the chat box.<br>The GM needs nothing set up here: Alt+click a token or use the bar's + to put any character on the bar.",
+      "NoPlayers": "No players connected.",
+      "Limit": "Each player can be given up to {n} characters."
+    },
+    "Look": {
+      "PickFirst": "Pick a character on the speaker bar, or select a token, then open this.",
+      "NotOwner": "You don't have permission to change this character's stage settings.",
+      "Title": "RP Stage — {name}",
+      "Keyword": "Keyword",
+      "PicturePath": "Picture path",
+      "ChoosePicture": "Choose picture",
+      "Preview": "Preview",
+      "RefTip": "Head height of a medium-sized character",
+      "Picture": "Stage picture",
+      "Size": "Size",
+      "AutoSize": "Auto ({size})",
+      "Framing": "Framing",
+      "Full": "Full body (to the feet)",
+      "Half": "Upper body / cropped",
+      "Scale": "Scale",
+      "Height": "Height (+ is up)",
+      "Faces": "Expressions",
+      "FacesHint": "“@keyword” in a line → back to the default face after a few seconds; “@@keyword” → kept until changed. “@default” brings back the normal picture.",
+      "NoFaces": "No expressions yet.",
+      "AddFace": "Add expression",
+      "Reset": "Reset",
+      "Detected": "Detected: {kind}{note}. The dotted line marks a medium-sized character's head height.",
+      "DetectedCut": "upper body / cropped (the bottom hides behind the dialogue box)",
+      "DetectedFull": "full body (feet just behind the dialogue box)",
+      "NotMeasured": "a picture from another site, so its margins can't be measured",
+      "Saved": "Saved {name}'s stage settings."
+    },
+    "Bar": {
+      "NoRight": "You can't speak as this character. The GM can add it to your speaking rights.",
+      "Note": {
+        "character": "My character",
+        "cast": "Given to you by the GM",
+        "owned": "My token on this scene"
+      },
+      "RightClickRemove": "Right-click: remove from the bar",
+      "ClickPin": "Click: keep speaking as this character (click again to release)",
+      "AltRightClick": "Alt+right-click: stage picture & expressions",
+      "Narration": "Narration",
+      "NarrationHint": "Speak as narration, not as a character (whatever the chat mode)",
+      "Voice": "Enter on voice (Discord) too: {state}",
+      "VoiceHint": "Whoever talks brings their character on stage",
+      "EmptyGM": "Alt+click a token to add",
+      "EmptyPlayer": "Add a character with +",
+      "Add": "Add the selected tokens to the bar",
+      "AddHint": "Alt+clicking a token or dropping an actor from the sidebar works too",
+      "SelectFirst": "Select the tokens to add first. Alt+click a token to add it straight away.",
+      "CantRemoveGM": "Characters you handed out can be removed in the Speaking Rights window.",
+      "CantRemove": "Your character, characters the GM gave you and your tokens on this scene can't be removed from the bar.",
+      "NarrationFailed": "Couldn't send the narration.",
+      "HudRemove": "Remove from the speaker bar",
+      "HudAdd": "Add to the speaker bar and speak as this character"
+    },
+    "Backdrop": {
+      "Title": "RP Stage — Backdrop",
+      "FolderTip": "Double-click: rename · drag pictures here to move them",
+      "DeleteFolder": "Delete folder (its pictures move to “No folder”)",
+      "RemoveItem": "Remove from the list (the file stays)",
+      "All": "All",
+      "NoFolder": "No folder",
+      "NewFolderName": "New folder name",
+      "NewFolder": "New folder",
+      "None": "No backdrop",
+      "NoneHint": "Blurred battle map",
+      "EmptyFolder": "This folder is empty. Drag pictures onto this tab from another tab.",
+      "EmptyLibrary": "Collect backdrops with “Add picture” or “Import folder” below.",
+      "Dim": "Darken",
+      "AddPicture": "Add picture",
+      "ImportFolder": "Import folder",
+      "Hint": "Click one and it's up on everyone's stage at once. This window opens whenever RP mode turns on (you can turn that off in the settings).",
+      "ReadFailed": "Couldn't read that folder.",
+      "NoPictures": "No pictures in that folder.",
+      "ImportedFolder": "Imported backdrops",
+      "Imported": "Imported {count} backdrop(s) into the '{name}' folder."
+    },
+    "Size": {
+      "tiny": "Tiny",
+      "sm": "Small",
+      "med": "Medium",
+      "lg": "Large",
+      "huge": "Huge",
+      "grg": "Gargantuan"
+    }
+  }
+}

@@ -6,6 +6,7 @@ import { VIDEO_RE, analyzeMedia, placeFigure } from "./figure.mjs";
 import { currentSpeaker, initSpeakers, keyOfSpeaker, voiceKeyFor } from "./speakers.mjs";
 import { currentBackdrop, isVideo, openBackgroundPicker } from "./backgrounds.mjs";
 import { showTipLater } from "../tips.mjs";
+import { k, t } from "../i18n.mjs";
 
 /* ======================================================================== *
  * Serious-RP stage (visual-novel mode)
@@ -113,12 +114,12 @@ export class Stage {
     const el = document.createElement("section");
     el.id = "rcs-stage";
     el.className = "hidden";
-    el.setAttribute("aria-label", "RP 무대");
+    el.setAttribute("aria-label", t("Stage.Aria"));
     el.innerHTML = `
       <div class="rcs-bg"></div>
       <div class="rcs-cast"></div>
       <div class="rcs-box hidden"><div class="rcs-name"></div><div class="rcs-text"></div><div class="rcs-typing"></div></div>
-      <div class="rcs-paused hidden" data-tooltip="일시정지 중"><i class="fa-solid fa-pause"></i></div>`;
+      <div class="rcs-paused hidden" data-tooltip="${esc(t("Stage.Paused"))}"><i class="fa-solid fa-pause"></i></div>`;
     // Behind a framed stage: the battle map, darkened.
     this.veil = document.createElement("div");
     this.veil.id = "rcs-stage-veil";
@@ -335,7 +336,7 @@ export class Stage {
 
   _setFace(key, face, keep, textLength) {
     const f = this.faces.get(key) ?? { base: null, temp: null };
-    if (face === "기본") { f.base = null; f.temp = null; }
+    if (face === "기본" || face === "default") { f.base = null; f.temp = null; }
     else if (keep) { f.base = face; f.temp = null; }
     else {
       f.temp = { key: face, until: Date.now() + faceMs(textLength) };
@@ -478,7 +479,7 @@ export class Stage {
     const typing = [...this.entries].filter(([, e]) => e.typing);
     const typingNames = typing.map(([key]) => stageLook(key).name);
     const typingEl = this.box.querySelector(".rcs-typing");
-    const typingText = typing.length ? `${typingNames.slice(0, 3).join(", ")} ${typing.every(([, e]) => e.voice) ? "말하는 중…" : "입력 중…"}` : "";
+    const typingText = typing.length ? `${typingNames.slice(0, 3).join(", ")} ${typing.every(([, e]) => e.voice) ? t("Stage.Speaking") : t("Stage.Typing")}` : "";
     // A line fades out after a while (setting, 1 minute), so nothing hangs around
     // while the table talks it over somewhere else.
     const life = Math.max(0, Number(setting("stageLineSeconds", 60)) || 0) * 1000;
@@ -527,10 +528,10 @@ export class Stage {
     ev.stopPropagation();
     let doc = null;
     try { doc = await fromUuid(ref.dataset.uuid); } catch (_) { /* gone */ }
-    if (!doc) return ui.notifications.warn(`'${ref.textContent}'을(를) 찾을 수 없습니다.`);
+    if (!doc) return ui.notifications.warn(t("Stage.RefMissing", { name: ref.textContent }));
     const LIMITED = CONST.DOCUMENT_OWNERSHIP_LEVELS?.LIMITED ?? 1;
     if (!doc.pack && doc.testUserPermission && !doc.testUserPermission(game.user, LIMITED)) {
-      return ui.notifications.warn(`'${doc.name}'을(를) 볼 권한이 없습니다.`);
+      return ui.notifications.warn(t("Stage.RefNoPermission", { name: doc.name }));
     }
     game.tooltip?.deactivate?.();
     if (doc.documentName === "JournalEntryPage") return doc.parent?.sheet?.render(true, { pageId: doc.id });
@@ -549,7 +550,7 @@ export class Stage {
       const div = document.createElement("div");
       div.innerHTML = raw.replace(/@\w+\[[^\]]*\]\{([^}]*)\}/g, "$1");
       const summary = (div.textContent ?? "").replace(/\s+/g, " ").trim();
-      tip = `<strong>${esc(doc?.name ?? ref.textContent)}</strong>${summary ? `<br>${esc(summary.length > 220 ? `${summary.slice(0, 219)}…` : summary)}` : ""}<br><small>눌러서 열기</small>`;
+      tip = `<strong>${esc(doc?.name ?? ref.textContent)}</strong>${summary ? `<br>${esc(summary.length > 220 ? `${summary.slice(0, 219)}…` : summary)}` : ""}<br><small>${esc(t("Stage.ClickToOpen"))}</small>`;
     } catch (_) { /* name only */ }
     ref.dataset.tooltip = tip;
     showTipLater(ref);
@@ -608,26 +609,26 @@ export function registerStageSettings() {
   hidden("stageBgLibrary", Object, {});
   hidden("stagePausedByUs", Boolean, false);
 
-  s("stageSlots", { name: "RP 무대: 한 번에 서는 인원", hint: "5명은 넓은 화면에서만 권합니다. 칸이 좁아져 그림이 작아지고, 날개 같은 넓은 그림은 옆 칸에 겹칩니다.", scope: "world", type: Number, default: 3, choices: { 3: "3명", 4: "4명 (큰 화면)", 5: "5명 (아주 넓은 화면)" }, onChange: redraw });
-  s("stageInset", { name: "RP 무대: 화면 가장자리 여백 (%)", hint: "0이면 화면 전체가 무대입니다. 값을 주면 사방이 그만큼 줄어든 '장면 창'이 되고, 바깥은 어둡게 가린 배틀맵이 보입니다. 권장 5~8.", scope: "world", type: Number, default: 0, range: { min: 0, max: 15, step: 1 }, onChange: () => stage()?.place() });
-  s("stageHold", { name: "RP 무대: 발언권 (초)", hint: "말을 마친 뒤 이 시간 동안은 새로 온 캐릭터에게 밀려나지 않습니다. 입력 중일 때는 항상 지켜집니다.", scope: "world", type: Number, default: 4, range: { min: 1, max: 30, step: 1 }, onChange: redraw });
-  s("stageDim", { name: "RP 무대: 회색으로 물러나기까지 (초)", scope: "world", type: Number, default: 30, range: { min: 10, max: 180, step: 5 }, onChange: redraw });
-  s("stageLeave", { name: "RP 무대: 저절로 퇴장 (초)", hint: "이 시간 동안 아무 말이 없으면 새 화자가 없어도 무대에서 내려갑니다. 0이면 자리를 내줄 때까지 남습니다.", scope: "world", type: Number, default: 120, range: { min: 0, max: 600, step: 10 }, onChange: redraw });
-  s("stageFaceSeconds", { name: "RP 무대: 표정 유지 (초)", hint: "대사의 \"@웃음\"은 이 시간(긴 대사는 조금 더) 뒤 기본 얼굴로 돌아옵니다. \"@@웃음\"은 바꿀 때까지 유지됩니다.", scope: "world", type: Number, default: 5, range: { min: 2, max: 20, step: 1 } });
-  s("stageNarration", { name: "RP 무대: GM 나레이션", hint: "말하는 캐릭터 바의 🪶(나레이션)로 쓴 말을 이름표 없는 나레이션으로 대사창에 띄웁니다.", scope: "world", type: Boolean, default: true });
-  s("stageLineSeconds", { name: "RP 무대: 대사가 사라지기까지 (초)", hint: "마지막 대사가 이 시간 뒤 대사창에서 사라집니다. 0이면 다음 대사까지 남습니다.", scope: "world", type: Number, default: 60, range: { min: 0, max: 600, step: 10 }, onChange: redraw });
-  s("stageVoice", { name: "RP 무대: 음성(디스코드)으로도 등장", hint: "디스코드 음성 연동이 있으면, 말을 하는 사람의 캐릭터(바에 고정한 캐릭터, 없으면 할당된 캐릭터)가 입력할 때처럼 무대에 오릅니다. 바의 🎙 버튼으로도 켜고 끕니다.", scope: "world", type: Boolean, default: false, onChange: () => { bar(); redraw(); } });
-  s("stageOwnedCast", { name: "RP 무대: 플레이어는 소유한 캐릭터로 말할 수 있음", hint: "끄면 GM이 'RP 발언권'에서 정해 준 캐릭터로만 말할 수 있습니다.", scope: "world", type: Boolean, default: true, onChange: () => { bar(); redraw(); } });
-  s("stageTypewriter", { name: "RP 무대: 대사 타자기 효과", hint: "대사가 한 글자씩(초당 약 40자) 나타납니다. 끄면 한 번에 보입니다.", scope: "world", type: Boolean, default: false });
-  s("stagePause", { name: "RP 모드 동안 게임 일시정지", hint: "RP 모드를 켜면 일시정지하고, 끌 때 원래대로 풀어 줍니다(이미 일시정지였으면 그대로 둡니다).", scope: "world", type: Boolean, default: true });
-  s("stageHidePause", { name: "RP 모드 동안 일시정지 표시 숨기기", hint: "화면 가운데의 일시정지 그림·글자(Alternative Pause Text 포함)를 숨기고, 무대 구석에 작은 ⏸ 표시만 둡니다.", scope: "world", type: Boolean, default: true, onChange: sync });
-  s("stagePickBg", { name: "RP 모드를 켤 때 배경 고르기 창 열기", scope: "world", type: Boolean, default: true });
-  s("stageLockView", { name: "배경이 맵을 가리는 동안 플레이어 화면 고정", hint: "RP 배경 그림이 깔려 있으면 플레이어가 맵을 끌어 옮기거나 확대하거나 토큰 위에 마우스를 올릴 수 없습니다.", scope: "world", type: Boolean, default: true, onChange: () => stage()?.refreshBackground() });
-  s("stageHideHud", { name: "RP 무대 중 파티 초상화·턴 트래커 숨기기", scope: "world", type: Boolean, default: true, onChange: sync });
-  s("stageShow", { name: "내 화면에 RP 무대 보이기", scope: "client", type: Boolean, default: true, onChange: sync });
+  s("stageSlots", { name: k("Settings.stageSlots.Name"), hint: k("Settings.stageSlots.Hint"), scope: "world", type: Number, default: 3, choices: { 3: k("Settings.stageSlots.Choices.3"), 4: k("Settings.stageSlots.Choices.4"), 5: k("Settings.stageSlots.Choices.5") }, onChange: redraw });
+  s("stageInset", { name: k("Settings.stageInset.Name"), hint: k("Settings.stageInset.Hint"), scope: "world", type: Number, default: 0, range: { min: 0, max: 15, step: 1 }, onChange: () => stage()?.place() });
+  s("stageHold", { name: k("Settings.stageHold.Name"), hint: k("Settings.stageHold.Hint"), scope: "world", type: Number, default: 4, range: { min: 1, max: 30, step: 1 }, onChange: redraw });
+  s("stageDim", { name: k("Settings.stageDim.Name"), scope: "world", type: Number, default: 30, range: { min: 10, max: 180, step: 5 }, onChange: redraw });
+  s("stageLeave", { name: k("Settings.stageLeave.Name"), hint: k("Settings.stageLeave.Hint"), scope: "world", type: Number, default: 120, range: { min: 0, max: 600, step: 10 }, onChange: redraw });
+  s("stageFaceSeconds", { name: k("Settings.stageFaceSeconds.Name"), hint: k("Settings.stageFaceSeconds.Hint"), scope: "world", type: Number, default: 5, range: { min: 2, max: 20, step: 1 } });
+  s("stageNarration", { name: k("Settings.stageNarration.Name"), hint: k("Settings.stageNarration.Hint"), scope: "world", type: Boolean, default: true });
+  s("stageLineSeconds", { name: k("Settings.stageLineSeconds.Name"), hint: k("Settings.stageLineSeconds.Hint"), scope: "world", type: Number, default: 60, range: { min: 0, max: 600, step: 10 }, onChange: redraw });
+  s("stageVoice", { name: k("Settings.stageVoice.Name"), hint: k("Settings.stageVoice.Hint"), scope: "world", type: Boolean, default: false, onChange: () => { bar(); redraw(); } });
+  s("stageOwnedCast", { name: k("Settings.stageOwnedCast.Name"), hint: k("Settings.stageOwnedCast.Hint"), scope: "world", type: Boolean, default: true, onChange: () => { bar(); redraw(); } });
+  s("stageTypewriter", { name: k("Settings.stageTypewriter.Name"), hint: k("Settings.stageTypewriter.Hint"), scope: "world", type: Boolean, default: false });
+  s("stagePause", { name: k("Settings.stagePause.Name"), hint: k("Settings.stagePause.Hint"), scope: "world", type: Boolean, default: true });
+  s("stageHidePause", { name: k("Settings.stageHidePause.Name"), hint: k("Settings.stageHidePause.Hint"), scope: "world", type: Boolean, default: true, onChange: sync });
+  s("stagePickBg", { name: k("Settings.stagePickBg.Name"), scope: "world", type: Boolean, default: true });
+  s("stageLockView", { name: k("Settings.stageLockView.Name"), hint: k("Settings.stageLockView.Hint"), scope: "world", type: Boolean, default: true, onChange: () => stage()?.refreshBackground() });
+  s("stageHideHud", { name: k("Settings.stageHideHud.Name"), scope: "world", type: Boolean, default: true, onChange: sync });
+  s("stageShow", { name: k("Settings.stageShow.Name"), scope: "client", type: Boolean, default: true, onChange: sync });
   s("speakerBar", {
-    name: "말하는 캐릭터 바", hint: "채팅 입력창 위의 얼굴 줄. 누르면 그 캐릭터로 말하기가 고정됩니다(다른 토큰을 눌러도 안 바뀜). 자동: GM은 RP 모드이거나 바에 누가 있을 때, 플레이어는 캐릭터가 둘 이상일 때 보입니다.",
-    scope: "client", type: String, default: "auto", choices: { auto: "자동", always: "항상", off: "끄기 (Foundry 기본대로)" }, onChange: bar
+    name: k("Settings.speakerBar.Name"), hint: k("Settings.speakerBar.Hint"),
+    scope: "client", type: String, default: "auto", choices: { auto: k("Settings.speakerBar.Choices.auto"), always: k("Settings.speakerBar.Choices.always"), off: k("Settings.speakerBar.Choices.off") }, onChange: bar
   });
 }
 
@@ -685,7 +686,7 @@ export function initStage() {
     const look = stageLook(key);
     const update = { [`flags.${MODULE_ID}.speaker`]: key };
     const content = String(message.content ?? "");
-    const keys = new Set(look.faces.map(f => f.key).concat("기본"));
+    const keys = new Set(look.faces.map(f => f.key).concat("기본", "default"));
     let face = null;
     let keep = false;
     const stripped = content.replace(FACE_RE, (m, pre, at, word) => {

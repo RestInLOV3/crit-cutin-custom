@@ -1,4 +1,5 @@
 import { MODULE_ID, setting } from "../config.mjs";
+import { k, lazyLabels, t } from "../i18n.mjs";
 
 /* ======================================================================== *
  * Landing page — a title screen for the campaign.
@@ -21,36 +22,37 @@ const SOCKET = `module.${MODULE_ID}`;
 const VIDEO_RE = /\.(webm|mp4|m4v|ogv)(\?|#|$)/i;
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
+/* Names, hints and labels below are getters: game.i18n is not ready while modules load. */
 export const TEMPLATES = {
-  cinematic: { label: "시네마틱", hint: "위아래 검은 띠, 천천히 다가가는 배경, 왼쪽 아래 큰 제목", accent: "#c9d6e8", particles: "dust" },
-  fantasy: { label: "다크 판타지", hint: "어두운 금테 액자, 가운데 제목과 세로 메뉴, 아래에 초상 카드", accent: "#d8b45a", particles: "embers" },
-  jrpg: { label: "JRPG 타이틀", hint: "밝은 로고, 오른쪽 메뉴와 화살표 커서, 비스듬한 파티 패널", accent: "#5cc8ff", particles: "petals" },
-  silhouette: { label: "실루엣 파티", hint: "검은 판 위에 파티가 한 줄로 — 마우스를 올린 사람만 빛을 받음", accent: "#ffb066", particles: "embers" },
-  storybook: { label: "동화책", hint: "양피지 책장 위의 제목과 메뉴, 핀으로 꽂은 사진 같은 초상", accent: "#b5482e", particles: "petals" },
-  neon: { label: "사이버 네온", hint: "어둠 속 네온 격자 바닥, 터미널 메뉴, 홀로그램 ID 카드", accent: "#ff3cac", particles: "dust" },
-  dossier: { label: "기밀 문서", hint: "책상 위 서류철, 타자기 글씨와 붉은 도장, 클립으로 끼운 사진 (CoC에 잘 어울림)", accent: "#9b2222", particles: "none" },
-  tarot: { label: "타로·별자리", hint: "별밤 아래 부채꼴로 펼친 타로 카드, 별 모양 메뉴", accent: "#e6c46a", particles: "dust" }
+  cinematic: { get label() { return t("Landing.Templates.cinematic.Label"); }, get hint() { return t("Landing.Templates.cinematic.Hint"); }, accent: "#c9d6e8", particles: "dust" },
+  fantasy: { get label() { return t("Landing.Templates.fantasy.Label"); }, get hint() { return t("Landing.Templates.fantasy.Hint"); }, accent: "#d8b45a", particles: "embers" },
+  jrpg: { get label() { return t("Landing.Templates.jrpg.Label"); }, get hint() { return t("Landing.Templates.jrpg.Hint"); }, accent: "#5cc8ff", particles: "petals" },
+  silhouette: { get label() { return t("Landing.Templates.silhouette.Label"); }, get hint() { return t("Landing.Templates.silhouette.Hint"); }, accent: "#ffb066", particles: "embers" },
+  storybook: { get label() { return t("Landing.Templates.storybook.Label"); }, get hint() { return t("Landing.Templates.storybook.Hint"); }, accent: "#b5482e", particles: "petals" },
+  neon: { get label() { return t("Landing.Templates.neon.Label"); }, get hint() { return t("Landing.Templates.neon.Hint"); }, accent: "#ff3cac", particles: "dust" },
+  dossier: { get label() { return t("Landing.Templates.dossier.Label"); }, get hint() { return t("Landing.Templates.dossier.Hint"); }, accent: "#9b2222", particles: "none" },
+  tarot: { get label() { return t("Landing.Templates.tarot.Label"); }, get hint() { return t("Landing.Templates.tarot.Hint"); }, accent: "#e6c46a", particles: "dust" }
 };
 
 /** Fonts the GM can pick (loaded from Google Fonts when used; without internet the default is used). */
 export const FONTS = {
-  "": { label: "모양 기본값" },
-  serif: { label: "기본 명조", stack: '"Noto Serif KR", "Nanum Myeongjo", "Batang", serif' },
-  sans: { label: "기본 고딕", stack: '"Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif' },
-  songmyung: { label: "송명 — 붓 명조", family: "Song Myung", stack: '"Song Myung", serif' },
-  gowunbatang: { label: "고운바탕 — 부드러운 명조", family: "Gowun Batang:wght@400;700", stack: '"Gowun Batang", serif' },
-  hahmlet: { label: "함렛 — 굵은 명조", family: "Hahmlet:wght@400;700;900", stack: '"Hahmlet", serif' },
-  nanummyeongjo: { label: "나눔명조", family: "Nanum Myeongjo:wght@400;700;800", stack: '"Nanum Myeongjo", serif' },
-  diphylleia: { label: "디필레이아 — 우아한", family: "Diphylleia", stack: '"Diphylleia", serif' },
-  blackhansans: { label: "블랙한산스 — 아주 굵게", family: "Black Han Sans", stack: '"Black Han Sans", sans-serif' },
-  dohyeon: { label: "도현 — 각진 고딕", family: "Do Hyeon", stack: '"Do Hyeon", sans-serif' },
-  jua: { label: "주아 — 둥근", family: "Jua", stack: '"Jua", sans-serif' },
-  gowundodum: { label: "고운돋움", family: "Gowun Dodum", stack: '"Gowun Dodum", sans-serif' },
-  orbit: { label: "오르빗 — SF", family: "Orbit", stack: '"Orbit", sans-serif' },
-  nanumpen: { label: "나눔손글씨 펜", family: "Nanum Pen Script", stack: '"Nanum Pen Script", cursive' },
-  gaegu: { label: "개구 — 손글씨", family: "Gaegu:wght@400;700", stack: '"Gaegu", cursive' },
-  typewriter: { label: "타자기 (고정폭)", family: "Nanum Gothic Coding:wght@400;700", stack: '"Courier Prime", "Courier New", "Nanum Gothic Coding", monospace' },
-  cinzel: { label: "Cinzel — 라틴 대문자 (한글은 명조)", family: "Cinzel:wght@400;700;900", stack: '"Cinzel", "Noto Serif KR", serif' }
+  "": { get label() { return t("Landing.Fonts.default"); } },
+  serif: { get label() { return t("Landing.Fonts.serif"); }, stack: '"Noto Serif KR", "Nanum Myeongjo", "Batang", serif' },
+  sans: { get label() { return t("Landing.Fonts.sans"); }, stack: '"Pretendard", "Noto Sans KR", "Malgun Gothic", sans-serif' },
+  songmyung: { get label() { return t("Landing.Fonts.songmyung"); }, family: "Song Myung", stack: '"Song Myung", serif' },
+  gowunbatang: { get label() { return t("Landing.Fonts.gowunbatang"); }, family: "Gowun Batang:wght@400;700", stack: '"Gowun Batang", serif' },
+  hahmlet: { get label() { return t("Landing.Fonts.hahmlet"); }, family: "Hahmlet:wght@400;700;900", stack: '"Hahmlet", serif' },
+  nanummyeongjo: { get label() { return t("Landing.Fonts.nanummyeongjo"); }, family: "Nanum Myeongjo:wght@400;700;800", stack: '"Nanum Myeongjo", serif' },
+  diphylleia: { get label() { return t("Landing.Fonts.diphylleia"); }, family: "Diphylleia", stack: '"Diphylleia", serif' },
+  blackhansans: { get label() { return t("Landing.Fonts.blackhansans"); }, family: "Black Han Sans", stack: '"Black Han Sans", sans-serif' },
+  dohyeon: { get label() { return t("Landing.Fonts.dohyeon"); }, family: "Do Hyeon", stack: '"Do Hyeon", sans-serif' },
+  jua: { get label() { return t("Landing.Fonts.jua"); }, family: "Jua", stack: '"Jua", sans-serif' },
+  gowundodum: { get label() { return t("Landing.Fonts.gowundodum"); }, family: "Gowun Dodum", stack: '"Gowun Dodum", sans-serif' },
+  orbit: { get label() { return t("Landing.Fonts.orbit"); }, family: "Orbit", stack: '"Orbit", sans-serif' },
+  nanumpen: { get label() { return t("Landing.Fonts.nanumpen"); }, family: "Nanum Pen Script", stack: '"Nanum Pen Script", cursive' },
+  gaegu: { get label() { return t("Landing.Fonts.gaegu"); }, family: "Gaegu:wght@400;700", stack: '"Gaegu", cursive' },
+  typewriter: { get label() { return t("Landing.Fonts.typewriter"); }, family: "Nanum Gothic Coding:wght@400;700", stack: '"Courier Prime", "Courier New", "Nanum Gothic Coding", monospace' },
+  cinzel: { get label() { return t("Landing.Fonts.cinzel"); }, family: "Cinzel:wght@400;700;900", stack: '"Cinzel", "Noto Serif KR", serif' }
 };
 
 const loadedFonts = new Set();
@@ -89,17 +91,17 @@ export function landingVars(cfg) {
 }
 
 export const ACTIONS = {
-  enter: { label: "입장하기 (이 화면 닫기)", icon: "fa-solid fa-door-open", target: false },
-  sheet: { label: "내 캐릭터 시트", icon: "fa-solid fa-id-card", target: false },
-  shop: { label: "상점 — 아이템 브라우저", icon: "fa-solid fa-store", target: false },
-  journal: { label: "저널 열기", icon: "fa-solid fa-book-open", target: "uuid" },
-  scene: { label: "장면으로 이동", icon: "fa-solid fa-map", target: "uuid" },
-  url: { label: "웹 링크 (새 탭)", icon: "fa-solid fa-link", target: "url" },
-  macro: { label: "매크로 실행", icon: "fa-solid fa-scroll", target: "uuid" },
-  stage: { label: "진지 RP 모드 켜기 (GM)", icon: "fa-solid fa-masks-theater", target: false }
+  enter: { get label() { return t("Landing.Actions.enter"); }, icon: "fa-solid fa-door-open", target: false },
+  sheet: { get label() { return t("Landing.Actions.sheet"); }, icon: "fa-solid fa-id-card", target: false },
+  shop: { get label() { return t("Landing.Actions.shop"); }, icon: "fa-solid fa-store", target: false },
+  journal: { get label() { return t("Landing.Actions.journal"); }, icon: "fa-solid fa-book-open", target: "uuid" },
+  scene: { get label() { return t("Landing.Actions.scene"); }, icon: "fa-solid fa-map", target: "uuid" },
+  url: { get label() { return t("Landing.Actions.url"); }, icon: "fa-solid fa-link", target: "url" },
+  macro: { get label() { return t("Landing.Actions.macro"); }, icon: "fa-solid fa-scroll", target: "uuid" },
+  stage: { get label() { return t("Landing.Actions.stage"); }, icon: "fa-solid fa-masks-theater", target: false }
 };
 
-export const PARTICLES = { none: "없음", embers: "불티 (위로)", dust: "먼지·빛가루", snow: "눈", petals: "꽃잎" };
+export const PARTICLES = lazyLabels({ none: "Landing.Particles.none", embers: "Landing.Particles.embers", dust: "Landing.Particles.dust", snow: "Landing.Particles.snow", petals: "Landing.Particles.petals" });
 
 export const DEFAULT_LANDING = Object.freeze({
   enabled: false,
@@ -118,11 +120,14 @@ export const DEFAULT_LANDING = Object.freeze({
   titleColor: "",
   textColor: "",
   lighting: { vignette: 0.55, rays: true, fog: true, particles: "embers", flicker: false, grade: 0.25 },
-  menu: [
-    { label: "입장하기", icon: "fa-solid fa-door-open", action: "enter", target: "" },
-    { label: "상점", icon: "fa-solid fa-store", action: "shop", target: "" },
-    { label: "내 캐릭터", icon: "fa-solid fa-id-card", action: "sheet", target: "" }
-  ],
+  // The default buttons (editable, saved with the scene) in the viewer's language.
+  get menu() {
+    return [
+      { label: t("Landing.Menu.enter"), icon: "fa-solid fa-door-open", action: "enter", target: "" },
+      { label: t("Landing.Menu.shop"), icon: "fa-solid fa-store", action: "shop", target: "" },
+      { label: t("Landing.Menu.sheet"), icon: "fa-solid fa-id-card", action: "sheet", target: "" }
+    ];
+  },
   cards: { show: true, actors: [], level: true, player: true }
 });
 
@@ -199,10 +204,10 @@ export function landingHtml(cfg, scene, { preview = false } = {}) {
       </div></article>`;
   }).join("");
   const gm = game.user?.isGM && !preview ? `<div class="rcl-gm">
-      <button type="button" data-gm="edit" data-tooltip="랜딩 페이지 꾸미기"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
-      <button type="button" data-gm="showAll" data-tooltip="모두에게 다시 보이기"><i class="fa-solid fa-eye"></i></button>
-      <button type="button" data-gm="enterAll" data-tooltip="모두 입장시키기 (모두의 화면에서 닫기)"><i class="fa-solid fa-person-walking-arrow-right"></i></button>
-      <button type="button" data-gm="close" data-tooltip="내 화면에서만 닫기"><i class="fa-solid fa-xmark"></i></button></div>` : "";
+      <button type="button" data-gm="edit" data-tooltip="${esc(t("Landing.Design"))}"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+      <button type="button" data-gm="showAll" data-tooltip="${esc(t("Landing.ShowAll"))}"><i class="fa-solid fa-eye"></i></button>
+      <button type="button" data-gm="enterAll" data-tooltip="${esc(t("Landing.EnterAll"))}"><i class="fa-solid fa-person-walking-arrow-right"></i></button>
+      <button type="button" data-gm="close" data-tooltip="${esc(t("Landing.CloseMine"))}"><i class="fa-solid fa-xmark"></i></button></div>` : "";
   return `
     <div class="rcl-bg">${media}</div>
     <div class="rcl-grade" style="--g:${Number(L.grade) || 0}"></div>
@@ -340,18 +345,18 @@ export async function runAction(item, landing) {
     case "enter": return landing?.enter();
     case "sheet": {
       const actor = game.user.character ?? game.actors.find(a => a.type === "character" && a.isOwner && a.hasPlayerOwner);
-      if (!actor) return ui.notifications.info("할당된 캐릭터가 없습니다.");
+      if (!actor) return ui.notifications.info(t("Landing.NoCharacter"));
       return actor.sheet?.render(true);
     }
     case "journal": {
       const doc = target ? await fromUuid(target).catch(() => null) : null;
-      if (!doc) return ui.notifications.warn("연결된 저널을 찾을 수 없습니다.");
+      if (!doc) return ui.notifications.warn(t("Landing.NoJournal"));
       if (doc.documentName === "JournalEntryPage") return doc.parent?.sheet?.render(true, { pageId: doc.id });
       return doc.sheet?.render(true);
     }
     case "scene": {
       const doc = target ? await fromUuid(target).catch(() => null) : null;
-      if (!doc) return ui.notifications.warn("연결된 장면을 찾을 수 없습니다.");
+      if (!doc) return ui.notifications.warn(t("Landing.NoScene"));
       return doc.view?.();
     }
     case "shop": {
@@ -366,7 +371,7 @@ export async function runAction(item, landing) {
       return;
     case "macro": {
       const doc = target ? await fromUuid(target).catch(() => null) : null;
-      if (!doc) return ui.notifications.warn("연결된 매크로를 찾을 수 없습니다.");
+      if (!doc) return ui.notifications.warn(t("Landing.NoMacro"));
       return doc.execute?.();
     }
     case "stage":
@@ -380,12 +385,12 @@ export async function runAction(item, landing) {
 export function registerLandingSettings() {
   const redraw = () => game.rutzCutin?.landing?.sync(true);
   game.settings.register(MODULE_ID, "landingShow", {
-    name: "랜딩 페이지: 내 화면에 보이기", hint: "끄면 랜딩 장면에서도 바로 맵이 보입니다.",
+    name: k("Settings.landingShow.Name"), hint: k("Settings.landingShow.Hint"),
     scope: "client", config: true, type: Boolean, default: true, onChange: redraw
   });
   game.settings.register(MODULE_ID, "landingMotion", {
-    name: "랜딩 페이지: 움직임", hint: "빛줄기·안개·불티와 천천히 다가가는 배경. '줄이기'면 멈춘 그림만.",
-    scope: "client", config: true, type: String, default: "full", choices: { full: "켜기", reduced: "줄이기" }, onChange: redraw
+    name: k("Settings.landingMotion.Name"), hint: k("Settings.landingMotion.Hint"),
+    scope: "client", config: true, type: String, default: "full", choices: { full: k("Settings.landingMotion.Choices.full"), reduced: k("Settings.landingMotion.Choices.reduced") }, onChange: redraw
   });
 }
 

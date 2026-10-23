@@ -1,4 +1,5 @@
 import { setting } from "./config.mjs";
+import { k, t } from "./i18n.mjs";
 
 /* ======================================================================== *
  * One button, one small menu: everything this module offers (RP mode,
@@ -31,7 +32,7 @@ class StageMenu extends AppV2 {
   static DEFAULT_OPTIONS = {
     id: "rcs-menu",
     classes: ["rcs-menu-window"],
-    window: { title: "연출 — Cinematic Stage", icon: "fa-solid fa-masks-theater" },
+    window: { title: k("Menu.Title"), icon: "fa-solid fa-masks-theater" },
     position: { width: 300, height: "auto", left: 110, top: 90 }
   };
 
@@ -41,15 +42,15 @@ class StageMenu extends AppV2 {
     const api = () => game.rutzCutin ?? {};
     const landingHere = !!globalThis.canvas?.scene?.getFlag?.("rutz-crit-cutin", "landing")?.enabled;
     return [
-      gm && { id: "rp", icon: "fa-solid fa-masks-theater", label: on ? "진지 RP 모드 끄기" : "진지 RP 모드 켜기", on, run: () => api().stageToggle?.() },
-      gm && on && { id: "bg", icon: "fa-solid fa-image", label: "RP 배경 고르기", run: () => api().pickBackground?.() },
-      gm && { id: "cast", icon: "fa-solid fa-users-rectangle", label: "발언권 — 플레이어가 맡을 캐릭터", run: () => api().cast?.() },
-      { id: "look", icon: "fa-solid fa-person-rays", label: "무대 그림·표정 (지금 말하는 캐릭터)", run: () => api().myStageLook?.() },
+      gm && { id: "rp", icon: "fa-solid fa-masks-theater", label: on ? t("Stage.TurnOff") : t("Stage.TurnOn"), on, run: () => api().stageToggle?.() },
+      gm && on && { id: "bg", icon: "fa-solid fa-image", label: t("Stage.PickBackground"), run: () => api().pickBackground?.() },
+      gm && { id: "cast", icon: "fa-solid fa-users-rectangle", label: t("Stage.CastMenu"), run: () => api().cast?.() },
+      { id: "look", icon: "fa-solid fa-person-rays", label: t("Menu.Look"), run: () => api().myStageLook?.() },
       "sep",
-      gm && { id: "landing", icon: "fa-solid fa-door-open", label: landingHere ? "이 장면의 랜딩 페이지 꾸미기" : "이 장면을 랜딩 페이지로 꾸미기", run: () => api().landingEditor?.() },
-      landingHere && { id: "landing-show", icon: "fa-solid fa-panorama", label: "랜딩 페이지 다시 보기", run: () => api().landing?.showAgain?.() },
+      gm && { id: "landing", icon: "fa-solid fa-door-open", label: landingHere ? t("Menu.LandingEdit") : t("Menu.LandingMake"), run: () => api().landingEditor?.() },
+      landingHere && { id: "landing-show", icon: "fa-solid fa-panorama", label: t("Menu.LandingShow"), run: () => api().landing?.showAgain?.() },
       "sep",
-      { id: "settings", icon: "fa-solid fa-sliders", label: "설정", run: () => api().settings?.(gm ? "stage" : "cutin") }
+      { id: "settings", icon: "fa-solid fa-sliders", label: t("Menu.Settings"), run: () => api().settings?.(gm ? "stage" : "cutin") }
     ].filter(Boolean);
   }
 

@@ -2,16 +2,20 @@ import { MODULE_ID, buildSpec, readConfig, setting } from "./config.mjs";
 import { analyzeMessage } from "./detect.mjs";
 import { CutinMenu, openEditor, soundFor } from "./editor.mjs";
 import { CutinPlayer } from "./player.mjs";
-import { DEFAULT_TEMPLATE, TEMPLATES } from "./templates.mjs";
-import { FUMBLE_PRESETS, SOUND_PRESETS, playCutinSound } from "./sound.mjs";
+import { DEFAULT_TEMPLATE, TEMPLATES, templateKeyChoices } from "./templates.mjs";
+import { FUMBLE_PRESET_KEYS, SOUND_PRESET_KEYS, playCutinSound } from "./sound.mjs";
+import { k, keyChoices, t } from "./i18n.mjs";
+import { PLUS } from "./edition.mjs";
+import { installCalmTooltips } from "./tips.mjs";
+// @plus — the RP stage and the landing page (Plus edition)
 import { initStage, onStageSocket, registerStageSettings, setStageActive, stageActive, toggleStage } from "./stage/stage.mjs";
 import { CastWindow, openCastWindow, openMyStageLook, openStageLook } from "./stage/windows.mjs";
 import { BackgroundPicker, openBackgroundPicker, setBackdrop } from "./stage/backgrounds.mjs";
 import { addSpeaker, currentSpeaker, setPin } from "./stage/speakers.mjs";
-import { installCalmTooltips } from "./tips.mjs";
 import { once, openStageMenu } from "./menu.mjs";
 import { initLanding, onLandingSocket, registerLandingSettings } from "./landing/landing.mjs";
 import { LandingMenu, openLandingEditor } from "./landing/editor.mjs";
+// @end-plus
 import { openSettings, registerSettingsWindows } from "./settings-window.mjs";
 import { installChatTimeFix } from "./chat-time.mjs";
 
@@ -34,61 +38,64 @@ let player = null;
 
 function registerSettings() {
   const s = (key, data) => game.settings.register(MODULE_ID, key, { config: true, ...data });
-  const templateChoices = Object.fromEntries(Object.entries(TEMPLATES).map(([key, t]) => [key, t.label]));
+  // Fumble cut-ins are the Plus edition's: in Lite their settings stay registered (defaults) but are not shown.
+  const p = (key, data) => s(key, { ...data, config: PLUS });
+  // Setting texts are i18n keys: Foundry (and our settings window) localizes them when shown.
+  const templateChoices = templateKeyChoices();
 
   game.settings.registerMenu(MODULE_ID, "editor", {
-    name: "캐릭터별 컷인 편집",
-    label: "컷인 편집기 열기",
-    hint: "캐릭터마다 그림·위치·확대·색·대사·효과음을 정합니다. 캐릭터 시트 위쪽의 ⚡ 버튼으로도 열 수 있습니다.",
+    name: k("Menus.editor.Name"),
+    label: k("Menus.editor.Label"),
+    hint: k("Menus.editor.Hint"),
     icon: "fa-solid fa-bolt",
     type: CutinMenu,
     restricted: false
   });
 
-  s("enabled", { name: "치명타 컷인 사용", scope: "world", type: Boolean, default: true });
+  s("enabled", { name: k("Settings.enabled.Name"), scope: "world", type: Boolean, default: true });
   s("trigger", {
-    name: "언제 띄울까",
-    hint: "PF2e에서는 '치명적 성공'이 성공 등급(DC 대비 +10 포함)이고, '내추럴 20'은 주사위 눈입니다. 다른 시스템은 내추럴 20으로 판단합니다.",
+    name: k("Settings.trigger.Name"),
+    hint: k("Settings.trigger.Hint"),
     scope: "world", type: String, default: "both",
-    choices: { both: "내추럴 20 또는 치명적 성공", nat20: "내추럴 20만", crit: "치명적 성공만" }
+    choices: { both: k("Settings.trigger.Choices.both"), nat20: k("Settings.trigger.Choices.nat20"), crit: k("Settings.trigger.Choices.crit") }
   });
-  s("groupSkill", { name: "기술·지각 판정에도", hint: "공격 굴림은 항상 포함됩니다.", scope: "world", type: Boolean, default: true });
-  s("groupSave", { name: "내성 굴림에도", scope: "world", type: Boolean, default: true });
-  s("groupFlat", { name: "플랫 체크·우선권에도", scope: "world", type: Boolean, default: false });
-  s("npc", { name: "NPC에도", hint: "플레이어가 소유하지 않은 캐릭터의 치명타에도 컷인을 띄웁니다.", scope: "world", type: Boolean, default: false });
-  s("defaultTemplate", { name: "기본 템플릿", hint: "캐릭터에 템플릿을 따로 정하지 않았을 때 씁니다.", scope: "world", type: String, default: DEFAULT_TEMPLATE, choices: templateChoices });
-  s("defaultTitle", { name: "기본 큰 글자", scope: "world", type: String, default: "CRITICAL!" });
-  s("badgeText", { name: "내추럴 20 문구", hint: "내추럴 20일 때 큰 글자 위에 붙는 작은 문구입니다. 비우면 표시하지 않습니다. 캐릭터마다 편집기에서 바꾸거나 끌 수도 있습니다.", scope: "world", type: String, default: "NAT 20" });
+  s("groupSkill", { name: k("Settings.groupSkill.Name"), hint: k("Settings.groupSkill.Hint"), scope: "world", type: Boolean, default: true });
+  s("groupSave", { name: k("Settings.groupSave.Name"), scope: "world", type: Boolean, default: true });
+  s("groupFlat", { name: k("Settings.groupFlat.Name"), scope: "world", type: Boolean, default: false });
+  s("npc", { name: k("Settings.npc.Name"), hint: k("Settings.npc.Hint"), scope: "world", type: Boolean, default: false });
+  s("defaultTemplate", { name: k("Settings.defaultTemplate.Name"), hint: k("Settings.defaultTemplate.Hint"), scope: "world", type: String, default: DEFAULT_TEMPLATE, choices: templateChoices });
+  s("defaultTitle", { name: k("Settings.defaultTitle.Name"), scope: "world", type: String, default: "CRITICAL!" });
+  s("badgeText", { name: k("Settings.badgeText.Name"), hint: k("Settings.badgeText.Hint"), scope: "world", type: String, default: "NAT 20" });
   s("soundPreset", {
-    name: "기본 효과음", hint: "효과음 1~5는 모듈이 그 자리에서 만들어 내는 소리입니다(음원 파일 없음). '파일'을 고르면 아래 경로의 파일을 씁니다.",
+    name: k("Settings.soundPreset.Name"), hint: k("Settings.soundPreset.Hint"),
     scope: "world", type: String, default: "synth1",
-    choices: { ...SOUND_PRESETS, file: "파일 (아래 경로)", none: "효과음 없음" }
+    choices: { ...keyChoices(SOUND_PRESET_KEYS), file: k("Sound.FilePath"), none: k("Sound.None") }
   });
-  s("defaultSound", { name: "기본 효과음 파일", hint: "위에서 '파일'을 골랐을 때 쓰는 효과음입니다.", scope: "world", type: String, default: "", filePicker: "audio" });
+  s("defaultSound", { name: k("Settings.defaultSound.Name"), hint: k("Settings.defaultSound.Hint"), scope: "world", type: String, default: "", filePicker: "audio" });
 
-  s("fumbleEnabled", { name: "대실패 컷인 사용", hint: "치명적 실패(또는 내추럴 1)에도 컷인을 띄웁니다. 같은 템플릿·그림에 차갑게 빛바랜 색, 금 가는 화면, 떨어지는 글자로. 판정 종류·NPC 조건은 위의 치명타 설정을 그대로 따릅니다.", scope: "world", type: Boolean, default: true });
-  s("fumbleTrigger", {
-    name: "대실패 — 언제 띄울까",
-    hint: "PF2e에서는 '치명적 실패'가 성공 등급(DC 대비 −10 포함)이고, '내추럴 1'은 주사위 눈입니다.",
+  p("fumbleEnabled", { name: k("Settings.fumbleEnabled.Name"), hint: k("Settings.fumbleEnabled.Hint"), scope: "world", type: Boolean, default: true });
+  p("fumbleTrigger", {
+    name: k("Settings.fumbleTrigger.Name"),
+    hint: k("Settings.fumbleTrigger.Hint"),
     scope: "world", type: String, default: "both",
-    choices: { both: "내추럴 1 또는 치명적 실패", nat1: "내추럴 1만", critfail: "치명적 실패만" }
+    choices: { both: k("Settings.fumbleTrigger.Choices.both"), nat1: k("Settings.fumbleTrigger.Choices.nat1"), critfail: k("Settings.fumbleTrigger.Choices.critfail") }
   });
-  s("fumbleTitle", { name: "대실패 큰 글자", scope: "world", type: String, default: "FUMBLE…" });
-  s("fumbleBadge", { name: "내추럴 1 문구", hint: "내추럴 1일 때 붙는 작은 문구. 비우면 표시하지 않습니다.", scope: "world", type: String, default: "NAT 1" });
-  s("fumbleSound", {
-    name: "대실패 기본 효과음", hint: "실패음 1~3도 모듈이 만들어 내는 소리입니다.",
+  p("fumbleTitle", { name: k("Settings.fumbleTitle.Name"), scope: "world", type: String, default: "FUMBLE…" });
+  p("fumbleBadge", { name: k("Settings.fumbleBadge.Name"), hint: k("Settings.fumbleBadge.Hint"), scope: "world", type: String, default: "NAT 1" });
+  p("fumbleSound", {
+    name: k("Settings.fumbleSound.Name"), hint: k("Settings.fumbleSound.Hint"),
     scope: "world", type: String, default: "fumble1",
-    choices: { ...FUMBLE_PRESETS, ...SOUND_PRESETS, file: "파일 (아래 경로)", none: "효과음 없음" }
+    choices: { ...keyChoices(FUMBLE_PRESET_KEYS), ...keyChoices(SOUND_PRESET_KEYS), file: k("Sound.FilePath"), none: k("Sound.None") }
   });
-  s("fumbleSoundFile", { name: "대실패 효과음 파일", scope: "world", type: String, default: "", filePicker: "audio" });
+  p("fumbleSoundFile", { name: k("Settings.fumbleSoundFile.Name"), scope: "world", type: String, default: "", filePicker: "audio" });
 
   s("show", {
-    name: "내 화면의 컷인", scope: "client", type: String, default: "full",
-    choices: { full: "켜기", reduced: "움직임 줄이기 (페이드만)", off: "끄기" }
+    name: k("Settings.show.Name"), scope: "client", type: String, default: "full",
+    choices: { full: k("Settings.show.Choices.full"), reduced: k("Settings.show.Choices.reduced"), off: k("Settings.show.Choices.off") }
   });
-  s("duration", { name: "컷인 길이 (초)", scope: "client", type: Number, default: 2.2, range: { min: 1.2, max: 4, step: 0.1 } });
-  s("volume", { name: "컷인 효과음 크기", hint: "Foundry의 인터페이스 볼륨에 곱해집니다.", scope: "client", type: Number, default: 0.6, range: { min: 0, max: 1, step: 0.05 } });
-  s("waitDice", { name: "Dice So Nice 주사위가 멈춘 뒤 재생", scope: "client", type: Boolean, default: true });
+  s("duration", { name: k("Settings.duration.Name"), scope: "client", type: Number, default: 2.2, range: { min: 1.2, max: 4, step: 0.1 } });
+  s("volume", { name: k("Settings.volume.Name"), hint: k("Settings.volume.Hint"), scope: "client", type: Number, default: 0.6, range: { min: 0, max: 1, step: 0.05 } });
+  s("waitDice", { name: k("Settings.waitDice.Name"), scope: "client", type: Boolean, default: true });
 }
 
 /* ---------------- chat messages ---------------- */
@@ -119,7 +126,7 @@ async function onChatMessage(message) {
 
   const result = analyzeMessage(message, {
     trigger: setting("trigger", "both"),
-    fumbleTrigger: setting("fumbleEnabled", true) ? setting("fumbleTrigger", "both") : "off",
+    fumbleTrigger: PLUS && setting("fumbleEnabled", true) ? setting("fumbleTrigger", "both") : "off",
     groups: { attack: true, skill: setting("groupSkill", true), save: setting("groupSave", true), flat: setting("groupFlat", false) }
   });
   if (!result) return;
@@ -149,6 +156,7 @@ async function resolveActor(target) {
 
 /** Play on this screen. `overrides` can replace any saved setting (template, image, quote …). */
 async function play(target, { nat20 = true, fumble = false, config: override = null, ...rest } = {}) {
+  if (!PLUS) fumble = false;
   const { actor, tokenDoc } = await resolveActor(target ?? canvas?.tokens?.controlled?.[0] ?? game.user.character);
   if (!actor) return false;
   const config = { ...readConfig(actor), ...(override ?? {}), ...rest };
@@ -162,6 +170,7 @@ async function play(target, { nat20 = true, fumble = false, config: override = n
  */
 async function broadcast(target, config = null, { nat20 = true, fumble = false } = {}) {
   if (!game.user.isGM) return false;
+  if (!PLUS) fumble = false;
   const { actor, tokenDoc } = await resolveActor(target);
   if (!actor) return false;
   const merged = { ...readConfig(actor), ...(config ?? {}) };
@@ -173,8 +182,10 @@ async function broadcast(target, config = null, { nat20 = true, fumble = false }
 }
 
 function onSocket(data) {
+  // @plus
   if (onStageSocket(data)) return;
   if (onLandingSocket(data)) return;
+  // @end-plus
   if (data?.action !== "play" || !data.spec || setting("show", "full") === "off") return;
   const duration = Math.round((Number(setting("duration", 2.2)) || 2.2) * 1000);
   player.enqueue({ spec: { ...data.spec, duration }, sound: data.sound ?? {} });
@@ -187,7 +198,7 @@ function addSheetButtons() {
   Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
     const actor = sheet.actor ?? sheet.document;
     if (!actor?.isOwner) return;
-    buttons.unshift({ label: "컷인", class: "rcc-open-editor", icon: "fa-solid fa-bolt fa-fw", onclick: () => openEditor(actor) });
+    buttons.unshift({ label: t("Sheet.Button"), class: "rcc-open-editor", icon: "fa-solid fa-bolt fa-fw", onclick: () => openEditor(actor) });
   });
   // Application V2 actor sheets: an entry in the header's control menu
   Hooks.on("getHeaderControlsActorSheetV2", (app, controls) => {
@@ -195,7 +206,7 @@ function addSheetButtons() {
     if (!actor?.isOwner || controls.some(c => c.action === "rccOpenEditor")) return;
     app.options.actions ??= {};
     app.options.actions.rccOpenEditor ??= function () { openEditor(this.actor ?? this.document); };
-    controls.push({ icon: "fa-solid fa-bolt fa-fw", label: "치명타 컷인", action: "rccOpenEditor", visible: true, onClick: () => openEditor(actor) });
+    controls.push({ icon: "fa-solid fa-bolt fa-fw", label: t("Sheet.Control"), action: "rccOpenEditor", visible: true, onClick: () => openEditor(actor) });
   });
 }
 
@@ -206,11 +217,12 @@ function addSheetButtons() {
  * PF2e HUD has built its "러츠 툴킷" tab and land inside it. Without the HUD
  * they go into the token tools.
  */
+// @plus
 function addStageControls() {
   const open = once(() => openStageMenu());
   Hooks.on("getSceneControlButtons", controls => {
     const tool = {
-      name: "rcsMenu", title: "연출 — RP 무대 · 랜딩 페이지", icon: "fa-solid fa-masks-theater", order: 60,
+      name: "rcsMenu", title: t("Controls.Menu"), icon: "fa-solid fa-masks-theater", order: 60,
       button: true, visible: true, onChange: () => open(), onClick: () => open()
     };
     // v13+: an object of controls, each with an object of tools. v12: arrays.
@@ -223,49 +235,62 @@ function addStageControls() {
     if (group?.tools) group.tools.rcsMenu = tool;
   });
 }
+// @end-plus
 
 Hooks.once("init", () => {
   registerSettings();
+  // @plus
   registerStageSettings();
   registerLandingSettings();
   game.settings.registerMenu(MODULE_ID, "landingEditor", {
-    name: "랜딩 페이지", label: "랜딩 페이지 꾸미기",
-    hint: "지금 보고 있는 장면을 캠페인 타이틀 화면으로 꾸밉니다.",
+    name: k("Menus.landingEditor.Name"), label: k("Menus.landingEditor.Label"),
+    hint: k("Menus.landingEditor.Hint"),
     icon: "fa-solid fa-wand-magic-sparkles", type: LandingMenu, restricted: true
   });
   game.settings.registerMenu(MODULE_ID, "stageCast", {
-    name: "진지 RP 무대 — 발언권", label: "발언권 창 열기",
-    hint: "진지 RP 모드를 켜고 끄며, 플레이어가 소유하지 않은 캐릭터(NPC 등)로 말할 수 있게 맡깁니다. 왼쪽 '러츠 툴킷' 탭에도 있습니다.",
+    name: k("Menus.stageCast.Name"), label: k("Menus.stageCast.Label"),
+    hint: k("Menus.stageCast.Hint"),
     icon: "fa-solid fa-users-rectangle", type: CastWindow, restricted: true
   });
   game.settings.registerMenu(MODULE_ID, "stageBackdrop", {
-    name: "진지 RP 무대 — 배경", label: "배경 고르기",
-    hint: "배경 그림을 폴더별로 모아 두고 고릅니다. RP 모드를 켤 때도 열립니다.",
+    name: k("Menus.stageBackdrop.Name"), label: k("Menus.stageBackdrop.Label"),
+    hint: k("Menus.stageBackdrop.Hint"),
     icon: "fa-solid fa-image", type: BackgroundPicker, restricted: true
   });
   game.keybindings.register(MODULE_ID, "stage-toggle", {
-    name: "진지 RP 모드 켜기/끄기 (GM)", editable: [],
+    name: k("Keybindings.stageToggle"), editable: [],
     restricted: true, onDown: () => { toggleStage(); return true; }
   });
+  // @end-plus
   addSheetButtons();
   installChatTimeFix();
 });
 
-Hooks.once("setup", () => { addStageControls(); registerSettingsWindows(); });
+Hooks.once("setup", () => {
+  // @plus
+  addStageControls();
+  // @end-plus
+  registerSettingsWindows();
+});
 
 Hooks.once("ready", () => {
   installCalmTooltips();
   player = new CutinPlayer();
-  const stage = initStage();
-  const landing = initLanding();
   game.rutzCutin = {
     play, broadcast, edit: openEditor, player, templates: Object.keys(TEMPLATES), sound: preset => playCutinSound({ preset, volume: 0.6 }),
+    settings: openSettings, edition: PLUS ? "plus" : "lite"
+  };
+  // @plus
+  const stage = initStage();
+  const landing = initLanding();
+  Object.assign(game.rutzCutin, {
     stage, stageOn: () => setStageActive(true), stageOff: () => setStageActive(false), stageToggle: toggleStage, isStageOn: stageActive,
     cast: openCastWindow, stageLook: openStageLook, myStageLook: openMyStageLook, menu: openStageMenu, pickBackground: openBackgroundPicker, setBackground: setBackdrop,
-    landing, landingEditor: openLandingEditor, settings: openSettings,
+    landing, landingEditor: openLandingEditor,
     speakAs: (entry, pin = true) => addSpeaker(typeof entry === "string" ? { actor: entry } : entry, { pin }), unpin: () => setPin(null), speaker: currentSpeaker
-  };
+  });
   stage.sync();
+  // @end-plus
   Hooks.on("createChatMessage", message => { onChatMessage(message).catch(err => console.error(`${MODULE_ID} |`, err)); });
   game.socket.on(SOCKET, onSocket);
   console.log(`${MODULE_ID} | ready`);

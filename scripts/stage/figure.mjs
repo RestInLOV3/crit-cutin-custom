@@ -19,8 +19,11 @@
  * character (size, scale, height, framing).
  * ======================================================================== */
 
+import { lazyLabels } from "../i18n.mjs";
+
 export const SIZE_FACTOR = { tiny: 0.42, sm: 0.6, med: 0.78, lg: 0.9, huge: 1, grg: 1.06 };
-export const SIZE_LABELS = { tiny: "아주 작음", sm: "작음", med: "중간", lg: "큼", huge: "거대", grg: "초거대" };
+/** { size: name }, localized when read. */
+export const SIZE_LABELS = lazyLabels({ tiny: "Size.tiny", sm: "Size.sm", med: "Size.med", lg: "Size.lg", huge: "Size.huge", grg: "Size.grg" });
 
 const SIZE_NAMES = {
   tiny: "tiny", sm: "sm", small: "sm", med: "med", medium: "med", lg: "lg", large: "lg",

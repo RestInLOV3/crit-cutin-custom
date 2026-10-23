@@ -8,20 +8,27 @@
  * Foundry's audio helper instead. Everything plays on this client only.
  * ======================================================================== */
 
-export const SOUND_PRESETS = {
-  synth1: "효과음 1",
-  synth2: "효과음 2",
-  synth3: "효과음 3",
-  synth4: "효과음 4",
-  synth5: "효과음 5"
+import { lazyLabels } from "./i18n.mjs";
+
+/** i18n keys of the presets' names (setting choices use these directly). */
+export const SOUND_PRESET_KEYS = {
+  synth1: "Sound.Presets.synth1",
+  synth2: "Sound.Presets.synth2",
+  synth3: "Sound.Presets.synth3",
+  synth4: "Sound.Presets.synth4",
+  synth5: "Sound.Presets.synth5"
 };
 
 /** The fumble cut-in's own three (any of the five above can be used too). */
-export const FUMBLE_PRESETS = {
-  fumble1: "실패음 1 — 뿌우우 (김빠진 나팔)",
-  fumble2: "실패음 2 — 쨍그랑 (깨지는 소리)",
-  fumble3: "실패음 3 — 쿵… 휘유우 (떨어지는 소리)"
+export const FUMBLE_PRESET_KEYS = {
+  fumble1: "Sound.Fumble.fumble1",
+  fumble2: "Sound.Fumble.fumble2",
+  fumble3: "Sound.Fumble.fumble3"
 };
+
+/** { preset: name }, localized when read. */
+export const SOUND_PRESETS = lazyLabels(SOUND_PRESET_KEYS);
+export const FUMBLE_PRESETS = lazyLabels(FUMBLE_PRESET_KEYS);
 
 let context = null;
 let noiseBuffer = null;

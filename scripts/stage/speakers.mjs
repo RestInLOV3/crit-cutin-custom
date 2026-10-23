@@ -1,6 +1,7 @@
 import { MODULE_ID, setting } from "../config.mjs";
 import { actorOfKey, canSpeakAs, castFor, entryKey, stageLook, tokenOf } from "./cast.mjs";
 import { faceCrop } from "./figure.mjs";
+import { t } from "../i18n.mjs";
 
 /* ======================================================================== *
  * Speaker quickbar — its own row between the dice bar and the chat controls.
@@ -126,7 +127,7 @@ export function keyOfSpeaker(speaker, userId) {
 export async function addSpeaker(entry, { pin = false, quiet = false } = {}) {
   if (!entry?.actor) return;
   if (!canSpeakAs(game.user.id, entry.actor)) {
-    if (!quiet) ui.notifications.warn("이 캐릭터로 말할 권한이 없습니다. GM이 RP 발언권에 넣어 주면 쓸 수 있어요.");
+    if (!quiet) ui.notifications.warn(t("Bar.NoRight"));
     return;
   }
   const key = entryKey(entry);
@@ -195,26 +196,26 @@ export class SpeakerBar {
     const isGM = game.user.isGM;
     const stageOn = !!setting("stageActive", false);
     const voiceOn = !!setting("stageVoice", false);
-    const notes = { character: "내 캐릭터", cast: "GM이 맡긴 캐릭터", owned: "이 장면의 내 토큰" };
+    const notes = { character: t("Bar.Note.character"), cast: t("Bar.Note.cast"), owned: t("Bar.Note.owned") };
     const faces = entries.map(e => {
       const look = stageLook(e.key);
-      const note = notes[e.auto] ?? "우클릭: 바에서 빼기";
+      const note = notes[e.auto] ?? t("Bar.RightClickRemove");
       return `<button type="button" class="who ${pin?.key === e.key ? "on" : ""} ${e.auto ? "auto" : ""}" data-key="${esc(e.key)}"
-        data-tooltip="<b>${esc(look.name)}</b><br><small>클릭: 이 캐릭터로 말하기 고정 (다시 누르면 해제) · ${note}<br>Alt+우클릭: 무대 그림·표정</small>" aria-label="${esc(look.name)}">
+        data-tooltip="<b>${esc(look.name)}</b><br><small>${esc(t("Bar.ClickPin"))} · ${esc(note)}<br>${esc(t("Bar.AltRightClick"))}</small>" aria-label="${esc(look.name)}">
         <img src="${esc(look.thumb)}" alt=""></button>`;
     }).join("");
-    const nowName = pin?.narrator ? "나레이션" : pin ? stageLook(pin.key).name : "자동";
+    const nowName = pin?.narrator ? t("Bar.Narration") : pin ? stageLook(pin.key).name : t("Common.Auto");
     // A small two-row block of buttons on the left: who-speaks modes first, then the GM's RP buttons.
     const tools = [
-      isGM ? `<button type="button" class="tool narr ${pin?.narrator ? "on" : ""}" data-act="narrate" data-tooltip="나레이션<br><small>캐릭터가 아닌 나레이션으로 말하기 (채팅 모드와 상관없이)</small>"><i class="fa-solid fa-feather-pointed"></i></button>` : "",
-      isGM ? `<button type="button" class="tool rp ${stageOn ? "on" : ""}" data-act="rp" data-tooltip="${stageOn ? "진지 RP 모드 끄기" : "진지 RP 모드 켜기"}"><i class="fa-solid fa-masks-theater"></i></button>` : "",
-      isGM && stageOn ? `<button type="button" class="tool" data-act="bg" data-tooltip="RP 배경 고르기"><i class="fa-solid fa-image"></i></button>` : "",
-      isGM && stageOn ? `<button type="button" class="tool ${voiceOn ? "on" : ""}" data-act="voice" data-tooltip="음성(디스코드)으로도 등장: ${voiceOn ? "켜짐" : "꺼짐"}<br><small>말을 하면 그 사람의 캐릭터가 무대에 오릅니다</small>"><i class="fa-solid fa-microphone${voiceOn ? "" : "-slash"}"></i></button>` : ""
+      isGM ? `<button type="button" class="tool narr ${pin?.narrator ? "on" : ""}" data-act="narrate" data-tooltip="${esc(t("Bar.Narration"))}<br><small>${esc(t("Bar.NarrationHint"))}</small>"><i class="fa-solid fa-feather-pointed"></i></button>` : "",
+      isGM ? `<button type="button" class="tool rp ${stageOn ? "on" : ""}" data-act="rp" data-tooltip="${esc(stageOn ? t("Stage.TurnOff") : t("Stage.TurnOn"))}"><i class="fa-solid fa-masks-theater"></i></button>` : "",
+      isGM && stageOn ? `<button type="button" class="tool" data-act="bg" data-tooltip="${esc(t("Stage.PickBackground"))}"><i class="fa-solid fa-image"></i></button>` : "",
+      isGM && stageOn ? `<button type="button" class="tool ${voiceOn ? "on" : ""}" data-act="voice" data-tooltip="${esc(t("Bar.Voice", { state: voiceOn ? t("Common.On") : t("Common.Off") }))}<br><small>${esc(t("Bar.VoiceHint"))}</small>"><i class="fa-solid fa-microphone${voiceOn ? "" : "-slash"}"></i></button>` : ""
     ].filter(Boolean);
     this.el.innerHTML = `
       ${tools.length ? `<div class="tools">${tools.join("")}</div>` : ""}
-      <div class="faces">${faces || `<span class="empty">${isGM ? "Alt+토큰 클릭으로 추가" : "+ 로 캐릭터 추가"}</span>`}</div>
-      <button type="button" class="tool add" data-act="add" data-tooltip="선택한 토큰을 바에 추가<br><small>Alt+토큰 클릭 · 사이드바 액터 끌어 놓기도 됩니다</small>"><i class="fa-solid fa-plus"></i></button>`;
+      <div class="faces">${faces || `<span class="empty">${isGM ? t("Bar.EmptyGM") : t("Bar.EmptyPlayer")}</span>`}</div>
+      <button type="button" class="tool add" data-act="add" data-tooltip="${esc(t("Bar.Add"))}<br><small>${esc(t("Bar.AddHint"))}</small>"><i class="fa-solid fa-plus"></i></button>`;
     this.el.querySelector(".faces").dataset.now = nowName;
     // Zoom each picture onto the face: the square is small.
     for (const img of this.el.querySelectorAll(".who img")) {
@@ -291,7 +292,7 @@ export class SpeakerBar {
     if (act === "voice") return game.settings.set(MODULE_ID, "stageVoice", !setting("stageVoice", false));
     if (act === "add") {
       const tokens = globalThis.canvas?.tokens?.controlled ?? [];
-      if (!tokens.length) return ui.notifications.info("바에 넣을 토큰을 먼저 선택하세요. Alt를 누른 채 토큰을 클릭하면 바로 들어갑니다.");
+      if (!tokens.length) return ui.notifications.info(t("Bar.SelectFirst"));
       for (const [i, t] of tokens.entries()) await addSpeaker(tokenEntry(t), { pin: i === 0 && tokens.length === 1 });
     }
   }
@@ -307,7 +308,7 @@ export class SpeakerBar {
       return game.rutzCutin?.stageLook?.(base);
     }
     if (who.classList.contains("auto")) {
-      return ui.notifications.info(game.user.isGM ? "맡긴 캐릭터는 RP 발언권 창에서 뺄 수 있습니다." : "내 캐릭터, GM이 맡긴 캐릭터, 이 장면의 내 토큰은 바에서 뺄 수 없습니다.");
+      return ui.notifications.info(game.user.isGM ? t("Bar.CantRemoveGM") : t("Bar.CantRemove"));
     }
     return removeSpeaker(who.dataset.key);
   }
@@ -343,12 +344,12 @@ async function postNarration(text) {
   const data = {
     author: game.user.id,
     content: asHTML(text),
-    speaker: { scene: globalThis.canvas?.scene?.id ?? null, actor: null, token: null, alias: "나레이션" },
+    speaker: { scene: globalThis.canvas?.scene?.id ?? null, actor: null, token: null, alias: t("Bar.Narration") },
     flags: { [MODULE_ID]: { narration: true } }
   };
   if (OOC !== undefined) data.style = OOC;
   try { await CM.create(data); }
-  catch (err) { console.error(`${MODULE_ID} | narration`, err); ui.notifications.error("나레이션을 보내지 못했습니다."); }
+  catch (err) { console.error(`${MODULE_ID} | narration`, err); ui.notifications.error(t("Bar.NarrationFailed")); }
 }
 
 export function initSpeakers() {
@@ -402,7 +403,7 @@ export function initSpeakers() {
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = `control-icon rcs-hud-speak ${onBar ? "active" : ""}`;
-    btn.dataset.tooltip = onBar ? "말하는 캐릭터 바에서 빼기" : "말하는 캐릭터 바에 넣고 이 캐릭터로 말하기";
+    btn.dataset.tooltip = onBar ? t("Bar.HudRemove") : t("Bar.HudAdd");
     btn.innerHTML = `<i class="fa-solid fa-comment-dots"></i>`;
     btn.addEventListener("click", ev => {
       ev.preventDefault();

@@ -1,6 +1,7 @@
 import { DEFAULT_CONFIG, FLAG, MODULE_ID, badgeFor, buildSpec, cleanConfig, effectiveTemplate, fumbleArt, portraitOf, readConfig, setting, soundFor, tokenArtOf } from "./config.mjs";
 import { FUMBLE_PRESETS, SOUND_PRESETS, interfaceVolume, playCutinSound } from "./sound.mjs";
 import { DEFAULT_TEMPLATE, TEMPLATES, cropFor, renderCutin } from "./templates.mjs";
+import { k, t } from "./i18n.mjs";
 
 /* ======================================================================== *
  * Cut-in editor
@@ -22,7 +23,7 @@ function filePicker(type, current, callback) {
   try {
     new FP({ type, current, callback }).render(true);
   } catch (err) {
-    ui.notifications.warn("파일 선택 창을 열 권한이 없습니다. 파일 경로를 직접 붙여 넣거나 GM에게 업로드를 부탁하세요.");
+    ui.notifications.warn(t("Editor.NoFilePicker"));
   }
 }
 
@@ -37,22 +38,22 @@ function soundChoice(sound) {
 
 function soundOptions(selected) {
   const world = setting("soundPreset", "synth1");
-  const worldLabel = SOUND_PRESETS[world] ?? (world === "file" ? "파일" : world === "none" ? "없음" : "효과음 1");
+  const worldLabel = SOUND_PRESETS[world] ?? (world === "file" ? t("Sound.File") : world === "none" ? t("Common.None") : SOUND_PRESETS.synth1);
   const opt = (value, label) => `<option value="${value}" ${selected === value ? "selected" : ""}>${esc(label)}</option>`;
-  return [opt("", `월드 기본 (${worldLabel})`), ...Object.entries(SOUND_PRESETS).map(([k, label]) => opt(k, label)), opt("file", "파일…"), opt("none", "효과음 없음")].join("");
+  return [opt("", t("Editor.WorldDefault", { label: worldLabel })), ...Object.entries(SOUND_PRESETS).map(([k, label]) => opt(k, label)), opt("file", t("Sound.FileEllipsis")), opt("none", t("Sound.None"))].join("");
 }
 
 function fumbleSoundOptions(selected) {
   const world = setting("fumbleSound", "fumble1");
-  const worldLabel = FUMBLE_PRESETS[world] ?? SOUND_PRESETS[world] ?? (world === "file" ? "파일" : world === "none" ? "없음" : "실패음 1");
+  const worldLabel = FUMBLE_PRESETS[world] ?? SOUND_PRESETS[world] ?? (world === "file" ? t("Sound.File") : world === "none" ? t("Common.None") : FUMBLE_PRESETS.fumble1);
   const opt = (value, label) => `<option value="${value}" ${selected === value ? "selected" : ""}>${esc(label)}</option>`;
-  return [opt("", `월드 기본 (${worldLabel.split(" — ")[0]})`), ...Object.entries(FUMBLE_PRESETS).map(([k, label]) => opt(k, label)),
-    ...Object.entries(SOUND_PRESETS).map(([k, label]) => opt(k, label)), opt("file", "파일…"), opt("none", "효과음 없음")].join("");
+  return [opt("", t("Editor.WorldDefault", { label: worldLabel.split(" — ")[0] })), ...Object.entries(FUMBLE_PRESETS).map(([k, label]) => opt(k, label)),
+    ...Object.entries(SOUND_PRESETS).map(([k, label]) => opt(k, label)), opt("file", t("Sound.FileEllipsis")), opt("none", t("Sound.None"))].join("");
 }
 
 export function openEditor(actor) {
-  if (!actor) return ui.notifications.warn("컷인을 편집할 캐릭터를 찾지 못했습니다.");
-  if (!actor.isOwner) return ui.notifications.warn("자신이 소유한 캐릭터만 편집할 수 있습니다.");
+  if (!actor) return ui.notifications.warn(t("Editor.NoActor"));
+  if (!actor.isOwner) return ui.notifications.warn(t("Editor.NotOwner"));
   const existing = open.get(actor.uuid);
   if (existing?.rendered) {
     existing.bringToFront?.();
@@ -72,7 +73,7 @@ export class CutinEditor extends AppV2 {
   };
 
   constructor(actor, options = {}) {
-    super(foundry.utils.mergeObject({ id: `rcc-editor-${actor.id}`, window: { title: `치명타 컷인 — ${actor.name}` } }, options));
+    super(foundry.utils.mergeObject({ id: `rcc-editor-${actor.id}`, window: { title: t("Editor.Title", { name: actor.name }) } }, options));
     this.actor = actor;
     this.draft = readConfig(actor);
     this._previewTimer = null;
@@ -103,7 +104,7 @@ export class CutinEditor extends AppV2 {
   async _renderHTML() {
     const d = this.draft;
     const world = TEMPLATES[setting("defaultTemplate", DEFAULT_TEMPLATE)] ?? TEMPLATES[DEFAULT_TEMPLATE];
-    const options = [`<option value="">월드 기본 (${esc(world.label.split(" — ")[0])})</option>`]
+    const options = [`<option value="">${esc(t("Editor.WorldDefault", { label: world.label.split(" — ")[0] }))}</option>`]
       .concat(Object.entries(TEMPLATES).map(([key, t]) => `<option value="${key}" ${d.template === key ? "selected" : ""}>${esc(t.label)}</option>`))
       .join("");
     const portrait = portraitOf(this.actor);
@@ -112,97 +113,101 @@ export class CutinEditor extends AppV2 {
     return `
       <div class="rcc-ed">
         <section class="rcc-ed-left">
-          <div class="rcc-frame preview" data-preview aria-label="미리보기 — 끌어서 위치, 휠로 확대"></div>
-          <p class="rcc-hint"><i class="fa-solid fa-hand"></i> 그림을 <b>끌어서 위치</b>, <b>휠로 확대</b>를 맞춥니다. 위치·확대는 <b>지금 고른 템플릿에만</b> 저장됩니다.</p>
+          <div class="rcc-frame preview" data-preview aria-label="${esc(t("Editor.PreviewAria"))}" data-off-label="${esc(t("Editor.OffLabel"))}"></div>
+          <p class="rcc-hint"><i class="fa-solid fa-hand"></i> ${t("Editor.DragHint")}</p>
           <p class="rcc-hint rcc-template-hint"></p>
+          <!-- @plus -->
           <div class="rcc-row rcc-mode">
-            <button type="button" data-act="mode-crit" class="${this.previewFumble ? "" : "on"}"><i class="fa-solid fa-bolt"></i> 치명타</button>
-            <button type="button" data-act="mode-fumble" class="${this.previewFumble ? "on" : ""}"><i class="fa-solid fa-heart-crack"></i> 대실패</button>
+            <button type="button" data-act="mode-crit" class="${this.previewFumble ? "" : "on"}"><i class="fa-solid fa-bolt"></i> ${t("Editor.Crit")}</button>
+            <button type="button" data-act="mode-fumble" class="${this.previewFumble ? "on" : ""}"><i class="fa-solid fa-heart-crack"></i> ${t("Editor.Fumble")}</button>
           </div>
+          <!-- @end-plus -->
           <div class="rcc-row">
-            <button type="button" data-act="play-here"><i class="fa-solid fa-play"></i> 여기서 재생</button>
-            <button type="button" data-act="play-full"><i class="fa-solid fa-expand"></i> 내 화면 전체로 재생</button>
-            ${gm ? `<button type="button" data-act="broadcast" data-tooltip="저장하지 않은 지금 모습 그대로 접속한 모두에게 한 번 보여 줍니다"><i class="fa-solid fa-tower-broadcast"></i> 모두에게 재생</button>` : ""}
+            <button type="button" data-act="play-here"><i class="fa-solid fa-play"></i> ${t("Editor.PlayHere")}</button>
+            <button type="button" data-act="play-full"><i class="fa-solid fa-expand"></i> ${t("Editor.PlayFull")}</button>
+            ${gm ? `<button type="button" data-act="broadcast" data-tooltip="${esc(t("Editor.BroadcastTip"))}"><i class="fa-solid fa-tower-broadcast"></i> ${t("Editor.Broadcast")}</button>` : ""}
             <span class="grow"></span>
-            <button type="button" data-act="reset-crop" data-tooltip="이 템플릿의 위치·확대를 기본값으로"><i class="fa-solid fa-crosshairs"></i> 위치 초기화</button>
+            <button type="button" data-act="reset-crop" data-tooltip="${esc(t("Editor.ResetCropTip"))}"><i class="fa-solid fa-crosshairs"></i> ${t("Editor.ResetCrop")}</button>
           </div>
         </section>
         <section class="rcc-ed-right">
-          <label class="rcc-check"><input type="checkbox" name="enabled" ${d.enabled !== false ? "checked" : ""}> 이 캐릭터의 치명타 컷인 사용</label>
+          <label class="rcc-check"><input type="checkbox" name="enabled" ${d.enabled !== false ? "checked" : ""}> ${t("Editor.Enabled")}</label>
 
-          <label class="rcc-field"><span>템플릿</span><select name="template">${options}</select></label>
+          <label class="rcc-field"><span>${t("Editor.Template")}</span><select name="template">${options}</select></label>
 
-          <div class="rcc-field rcc-art-field ${this.previewFumble ? "fumble" : ""}"><span>그림 — ${this.previewFumble ? `<b class="rcc-tag f"><i class="fa-solid fa-heart-crack"></i> 대실패</b>` : `<b class="rcc-tag c"><i class="fa-solid fa-bolt"></i> 치명타</b>`} <em>(왼쪽 아래 치명타/대실패로 바꿔 가며 따로 지정)</em></span>
+          <div class="rcc-field rcc-art-field ${this.previewFumble ? "fumble" : ""}"><span>${t("Editor.Picture")} — ${this.previewFumble ? `<b class="rcc-tag f"><i class="fa-solid fa-heart-crack"></i> ${t("Editor.Fumble")}</b>` : `<b class="rcc-tag c"><i class="fa-solid fa-bolt"></i> ${t("Editor.Crit")}</b>`} <em>${t("Editor.PictureNote")}</em></span>
             <div class="rcc-pick">
-              <input type="text" name="image" value="${esc(d[this.imgKey])}" placeholder="${this.previewFumble ? "비우면 치명타 그림을 그대로 씀" : "비우면 캐릭터 초상화"}">
-              <button type="button" data-pick="image" data-tooltip="파일 고르기"><i class="fa-solid fa-file-image"></i></button>
+              <input type="text" name="image" value="${esc(d[this.imgKey])}" placeholder="${esc(this.previewFumble ? t("Editor.FumbleImagePlaceholder") : t("Common.EmptyPortrait"))}">
+              <button type="button" data-pick="image" data-tooltip="${esc(t("Common.ChooseFile"))}"><i class="fa-solid fa-file-image"></i></button>
             </div>
             <div class="rcc-row small">
-              ${this.previewFumble ? `<button type="button" data-act="same-as-crit" ${this.sharedArt ? "disabled" : ""}><i class="fa-solid fa-link"></i> 치명타 그림과 같게</button>` : ""}
-              <button type="button" data-act="use-portrait" ${portrait ? "" : "disabled"}><i class="fa-solid fa-user"></i> 캐릭터 초상화</button>
-              <button type="button" data-act="use-token" ${tokenArt ? "" : "disabled"}><i class="fa-solid fa-circle-user"></i> 토큰 그림</button>
-              <label class="rcc-check inline"><input type="checkbox" name="flip" ${this.flipped ? "checked" : ""} ${this.sharedArt ? "disabled" : ""}> 좌우 반전</label>
+              ${this.previewFumble ? `<button type="button" data-act="same-as-crit" ${this.sharedArt ? "disabled" : ""}><i class="fa-solid fa-link"></i> ${t("Editor.SameAsCrit")}</button>` : ""}
+              <button type="button" data-act="use-portrait" ${portrait ? "" : "disabled"}><i class="fa-solid fa-user"></i> ${t("Editor.Portrait")}</button>
+              <button type="button" data-act="use-token" ${tokenArt ? "" : "disabled"}><i class="fa-solid fa-circle-user"></i> ${t("Editor.TokenArt")}</button>
+              <label class="rcc-check inline"><input type="checkbox" name="flip" ${this.flipped ? "checked" : ""} ${this.sharedArt ? "disabled" : ""}> ${t("Common.Flip")}</label>
             </div>
           </div>
 
-          <div class="rcc-field"><span>위치·확대 <em>(이 템플릿)</em></span>
+          <div class="rcc-field"><span>${t("Editor.Crop")} <em>${t("Editor.ThisTemplate")}</em></span>
             <div class="rcc-slider"><i class="fa-solid fa-magnifying-glass-plus"></i><input type="range" name="zoom" min="1" max="4" step="0.01"><output data-for="zoom"></output></div>
             <div class="rcc-slider"><i class="fa-solid fa-arrows-left-right"></i><input type="range" name="x" min="0" max="100" step="0.5"><output data-for="x"></output></div>
             <div class="rcc-slider"><i class="fa-solid fa-arrows-up-down"></i><input type="range" name="y" min="0" max="100" step="0.5"><output data-for="y"></output></div>
           </div>
 
-          <div class="rcc-field"><span>색</span>
+          <div class="rcc-field"><span>${t("Editor.Colors")}</span>
             <div class="rcc-row small">
-              <label class="rcc-color">강조 <input type="color" name="accent"></label>
-              <label class="rcc-color">바탕 <input type="color" name="accent2"></label>
-              <button type="button" data-act="reset-colors"><i class="fa-solid fa-rotate-left"></i> 템플릿 기본 색</button>
+              <label class="rcc-color">${t("Editor.Accent")} <input type="color" name="accent"></label>
+              <label class="rcc-color">${t("Editor.Base")} <input type="color" name="accent2"></label>
+              <button type="button" data-act="reset-colors"><i class="fa-solid fa-rotate-left"></i> ${t("Editor.ResetColors")}</button>
             </div>
           </div>
 
-          <label class="rcc-field"><span>큰 글자</span><input type="text" name="title" maxlength="24" value="${esc(d.title)}" placeholder="${esc(setting("defaultTitle", "CRITICAL!") || "CRITICAL!")}"></label>
-          <label class="rcc-field"><span>대사 <em>(선택)</em></span><input type="text" name="quote" maxlength="60" value="${esc(d.quote)}" placeholder="예) 이걸로 끝이다!"></label>
+          <label class="rcc-field"><span>${t("Editor.Headline")}</span><input type="text" name="title" maxlength="24" value="${esc(d.title)}" placeholder="${esc(setting("defaultTitle", "CRITICAL!") || "CRITICAL!")}"></label>
+          <label class="rcc-field"><span>${t("Editor.Quote")} <em>${t("Common.Optional")}</em></span><input type="text" name="quote" maxlength="60" value="${esc(d.quote)}" placeholder="${esc(t("Editor.QuotePlaceholder"))}"></label>
 
-          <div class="rcc-field"><span>내추럴 20 문구</span>
+          <div class="rcc-field"><span>${t("Editor.Badge")}</span>
             <div class="rcc-row small">
-              <input type="text" name="badge" maxlength="24" value="${esc(d.badge)}" placeholder="${esc(setting("badgeText", "NAT 20") || "(월드 설정에서 꺼짐)")}">
-              <label class="rcc-check inline"><input type="checkbox" name="hideBadge" ${d.hideBadge ? "checked" : ""}> 표시 안 함</label>
+              <input type="text" name="badge" maxlength="24" value="${esc(d.badge)}" placeholder="${esc(setting("badgeText", "NAT 20") || t("Editor.BadgeOff"))}">
+              <label class="rcc-check inline"><input type="checkbox" name="hideBadge" ${d.hideBadge ? "checked" : ""}> ${t("Editor.HideBadge")}</label>
             </div>
           </div>
 
-          <div class="rcc-field"><span>효과음</span>
+          <div class="rcc-field"><span>${t("Editor.Sound")}</span>
             <div class="rcc-row small">
               <select name="soundChoice">${soundOptions(soundChoice(d.sound))}</select>
-              <button type="button" data-act="listen" data-tooltip="지금 고른 효과음 듣기"><i class="fa-solid fa-volume-high"></i> 듣기</button>
+              <button type="button" data-act="listen" data-tooltip="${esc(t("Editor.ListenTip"))}"><i class="fa-solid fa-volume-high"></i> ${t("Editor.Listen")}</button>
             </div>
             <div class="rcc-pick" data-sound-file ${soundChoice(d.sound) === "file" ? "" : "hidden"}>
-              <input type="text" name="sound" value="${esc(soundChoice(d.sound) === "file" ? d.sound : "")}" placeholder="효과음 파일 경로 (ogg / mp3 / wav)">
-              <button type="button" data-pick="sound" data-tooltip="파일 고르기"><i class="fa-solid fa-file-audio"></i></button>
+              <input type="text" name="sound" value="${esc(soundChoice(d.sound) === "file" ? d.sound : "")}" placeholder="${esc(t("Editor.SoundPath"))}">
+              <button type="button" data-pick="sound" data-tooltip="${esc(t("Common.ChooseFile"))}"><i class="fa-solid fa-file-audio"></i></button>
             </div>
           </div>
 
-          <details class="rcc-fumble-ed" ${this.previewFumble ? "open" : ""}><summary><i class="fa-solid fa-heart-crack"></i> 대실패 컷인 <em>(같은 템플릿, 그림은 위에서 따로 · 차갑게 빛바랜 색·금 가는 화면·떨어지는 글자)</em></summary>
-            <label class="rcc-check"><input type="checkbox" name="fumbleEnabled" ${d.fumbleEnabled !== false ? "checked" : ""}> 이 캐릭터의 대실패 컷인 사용</label>
-            <label class="rcc-field"><span>큰 글자</span><input type="text" name="fumbleTitle" maxlength="24" value="${esc(d.fumbleTitle)}" placeholder="${esc(setting("fumbleTitle", "FUMBLE…") || "FUMBLE…")}"></label>
-            <label class="rcc-field"><span>대사 <em>(선택)</em></span><input type="text" name="fumbleQuote" maxlength="60" value="${esc(d.fumbleQuote)}" placeholder="예) 어… 이게 아닌데?"></label>
-            <label class="rcc-field"><span>내추럴 1 문구</span><input type="text" name="fumbleBadge" maxlength="24" value="${esc(d.fumbleBadge)}" placeholder="${esc(setting("fumbleBadge", "NAT 1") || "(월드 설정에서 꺼짐)")}"></label>
-            <div class="rcc-field"><span>효과음</span>
+          <!-- @plus -->
+          <details class="rcc-fumble-ed" ${this.previewFumble ? "open" : ""}><summary><i class="fa-solid fa-heart-crack"></i> ${t("Editor.FumbleSection")} <em>${t("Editor.FumbleSectionNote")}</em></summary>
+            <label class="rcc-check"><input type="checkbox" name="fumbleEnabled" ${d.fumbleEnabled !== false ? "checked" : ""}> ${t("Editor.FumbleEnabled")}</label>
+            <label class="rcc-field"><span>${t("Editor.Headline")}</span><input type="text" name="fumbleTitle" maxlength="24" value="${esc(d.fumbleTitle)}" placeholder="${esc(setting("fumbleTitle", "FUMBLE…") || "FUMBLE…")}"></label>
+            <label class="rcc-field"><span>${t("Editor.Quote")} <em>${t("Common.Optional")}</em></span><input type="text" name="fumbleQuote" maxlength="60" value="${esc(d.fumbleQuote)}" placeholder="${esc(t("Editor.FumbleQuotePlaceholder"))}"></label>
+            <label class="rcc-field"><span>${t("Editor.FumbleBadge")}</span><input type="text" name="fumbleBadge" maxlength="24" value="${esc(d.fumbleBadge)}" placeholder="${esc(setting("fumbleBadge", "NAT 1") || t("Editor.BadgeOff"))}"></label>
+            <div class="rcc-field"><span>${t("Editor.Sound")}</span>
               <div class="rcc-row small">
                 <select name="fumbleSoundChoice">${fumbleSoundOptions(soundChoice(d.fumbleSound))}</select>
-                <button type="button" data-act="listen-fumble" data-tooltip="대실패 효과음 듣기"><i class="fa-solid fa-volume-high"></i> 듣기</button>
+                <button type="button" data-act="listen-fumble" data-tooltip="${esc(t("Editor.ListenFumbleTip"))}"><i class="fa-solid fa-volume-high"></i> ${t("Editor.Listen")}</button>
               </div>
               <div class="rcc-pick" data-fumble-file ${soundChoice(d.fumbleSound) === "file" ? "" : "hidden"}>
-                <input type="text" name="fumbleSound" value="${esc(soundChoice(d.fumbleSound) === "file" ? d.fumbleSound : "")}" placeholder="효과음 파일 경로 (ogg / mp3 / wav)">
-                <button type="button" data-pick="fumbleSound" data-tooltip="파일 고르기"><i class="fa-solid fa-file-audio"></i></button>
+                <input type="text" name="fumbleSound" value="${esc(soundChoice(d.fumbleSound) === "file" ? d.fumbleSound : "")}" placeholder="${esc(t("Editor.SoundPath"))}">
+                <button type="button" data-pick="fumbleSound" data-tooltip="${esc(t("Common.ChooseFile"))}"><i class="fa-solid fa-file-audio"></i></button>
               </div>
             </div>
           </details>
+          <!-- @end-plus -->
         </section>
       </div>
       <footer class="rcc-ed-footer">
-        <button type="button" data-act="defaults"><i class="fa-solid fa-eraser"></i> 모두 기본값으로</button>
+        <button type="button" data-act="defaults"><i class="fa-solid fa-eraser"></i> ${t("Editor.Defaults")}</button>
         <span class="grow"></span>
-        <button type="button" data-act="cancel">닫기</button>
-        <button type="button" data-act="save" class="primary"><i class="fa-solid fa-floppy-disk"></i> 저장</button>
+        <button type="button" data-act="cancel">${t("Common.Close")}</button>
+        <button type="button" data-act="save" class="primary"><i class="fa-solid fa-floppy-disk"></i> ${t("Common.Save")}</button>
       </footer>`;
   }
 
@@ -520,11 +525,11 @@ export class CutinEditor extends AppV2 {
     try {
       await this.actor.update({ [`flags.${MODULE_ID}.-=${FLAG}`]: null }, { render: false });
       await this.actor.setFlag(MODULE_ID, FLAG, data);
-      ui.notifications.info(`${this.actor.name}의 치명타 컷인을 저장했습니다.`);
+      ui.notifications.info(t("Editor.Saved", { name: this.actor.name }));
       this.close();
     } catch (err) {
       console.error(`${MODULE_ID} | save failed`, err);
-      ui.notifications.error("저장하지 못했습니다. 이 캐릭터의 소유 권한을 확인해 주세요.");
+      ui.notifications.error(t("Editor.SaveFailed"));
     }
   }
 }
@@ -546,7 +551,7 @@ export function editorCandidates() {
 export class CutinMenu extends AppV2 {
   static DEFAULT_OPTIONS = {
     classes: ["rcc-menu"],
-    window: { title: "치명타 컷인 — 캐릭터 고르기", icon: "fa-solid fa-bolt" },
+    window: { title: k("Editor.PickTitle"), icon: "fa-solid fa-bolt" },
     position: { width: 380, height: "auto" }
   };
 
@@ -561,12 +566,12 @@ export class CutinMenu extends AppV2 {
 
   async _renderHTML() {
     const list = editorCandidates();
-    if (!list.length) return `<p class="rcc-hint">편집할 수 있는 캐릭터가 없습니다. 캐릭터를 소유하고 있는지 확인하세요.</p>`;
-    return `<p class="rcc-hint">컷인을 편집할 캐릭터를 고르세요. 캐릭터 시트 위쪽의 <i class="fa-solid fa-bolt"></i> 버튼으로도 열 수 있습니다.</p>
+    if (!list.length) return `<p class="rcc-hint">${t("Editor.PickNone")}</p>`;
+    return `<p class="rcc-hint">${t("Editor.PickHint")}</p>
       <ul class="rcc-pick-list">${list.map(a => `
         <li><button type="button" data-uuid="${esc(a.uuid)}">
           <img src="${esc(portraitOf(a))}" alt=""><span>${esc(a.name)}</span>
-          ${readConfig(a).enabled === false ? `<em>꺼짐</em>` : ""}
+          ${readConfig(a).enabled === false ? `<em>${t("Common.Off")}</em>` : ""}
         </button></li>`).join("")}</ul>`;
   }
 

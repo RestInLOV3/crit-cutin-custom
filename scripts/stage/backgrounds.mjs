@@ -1,4 +1,5 @@
 import { MODULE_ID, setting } from "../config.mjs";
+import { k, t } from "../i18n.mjs";
 
 /* ======================================================================== *
  * Stage backgrounds (GM)
@@ -59,7 +60,7 @@ export function isVideo(src) {
 function filePicker(options) {
   const FP = foundry.applications?.apps?.FilePicker?.implementation ?? globalThis.FilePicker;
   try { new FP(options).render(true); return FP; }
-  catch (_) { ui.notifications.warn("파일 선택 창을 열 권한이 없습니다."); return null; }
+  catch (_) { ui.notifications.warn(t("Common.NoFilePicker")); return null; }
 }
 
 /* ======================================================================== */
@@ -76,7 +77,7 @@ export class BackgroundPicker extends AppV2 {
   static DEFAULT_OPTIONS = {
     id: "rcs-bg-picker",
     classes: ["rcs-bg-window"],
-    window: { title: "RP 무대 — 배경", icon: "fa-solid fa-image", resizable: true },
+    window: { title: k("Backdrop.Title"), icon: "fa-solid fa-image", resizable: true },
     position: { width: 760, height: "auto" }
   };
 
@@ -108,29 +109,29 @@ export class BackgroundPicker extends AppV2 {
     const tab = (key, label, extra = "") => `<button type="button" class="tab ${this.tab === key ? "on" : ""}" data-tab="${key}" ${extra}>${label}</button>`;
     const folderTab = f => this.editing === f.id
       ? `<input class="tab-edit" data-rename="${f.id}" value="${esc(f.name)}" maxlength="30">`
-      : `${tab(f.id, esc(f.name), `data-folder="${f.id}" data-tooltip="두 번 클릭: 이름 바꾸기 · 그림을 여기로 끌어 옮기기"`)}${this.tab === f.id ? `<button type="button" class="tab-del" data-del-folder="${f.id}" data-tooltip="폴더 지우기 (그림은 '폴더 없음'으로)"><i class="fa-solid fa-xmark"></i></button>` : ""}`;
+      : `${tab(f.id, esc(f.name), `data-folder="${f.id}" data-tooltip="${esc(t("Backdrop.FolderTip"))}"`)}${this.tab === f.id ? `<button type="button" class="tab-del" data-del-folder="${f.id}" data-tooltip="${esc(t("Backdrop.DeleteFolder"))}"><i class="fa-solid fa-xmark"></i></button>` : ""}`;
     const thumb = i => {
       const media = isVideo(i.src) ? `<video src="${esc(i.src)}" muted preload="metadata"></video>` : `<img src="${esc(i.src)}" alt="" loading="lazy">`;
       return `<div class="thumb ${cur.src === i.src ? "on" : ""}" data-src="${esc(i.src)}" data-item="${i.id}" draggable="true" data-tooltip="${esc(i.name)}">
         ${media}<span class="name">${esc(i.name)}</span>
-        <button type="button" class="rm" data-rm="${i.id}" data-tooltip="목록에서 빼기 (파일은 그대로)"><i class="fa-solid fa-xmark"></i></button></div>`;
+        <button type="button" class="rm" data-rm="${i.id}" data-tooltip="${esc(t("Backdrop.RemoveItem"))}"><i class="fa-solid fa-xmark"></i></button></div>`;
     };
     return `<div class="rcs-bgp">
-      <nav class="tabs">${tab("all", "전체")}${lib.folders.map(folderTab).join("")}${unfiled && lib.folders.length ? tab("none", "폴더 없음") : ""}
-        ${this.editing === "new" ? `<input class="tab-edit" data-rename="new" placeholder="새 폴더 이름" maxlength="30">` : `<button type="button" class="tab add" data-act="folder" data-tooltip="새 폴더"><i class="fa-solid fa-folder-plus"></i></button>`}</nav>
+      <nav class="tabs">${tab("all", esc(t("Backdrop.All")))}${lib.folders.map(folderTab).join("")}${unfiled && lib.folders.length ? tab("none", esc(t("Backdrop.NoFolder"))) : ""}
+        ${this.editing === "new" ? `<input class="tab-edit" data-rename="new" placeholder="${esc(t("Backdrop.NewFolderName"))}" maxlength="30">` : `<button type="button" class="tab add" data-act="folder" data-tooltip="${esc(t("Backdrop.NewFolder"))}"><i class="fa-solid fa-folder-plus"></i></button>`}</nav>
       <div class="grid">
-        <div class="thumb none ${cur.src ? "" : "on"}" data-src=""><span class="blank"><i class="fa-solid fa-map"></i>배경 없음<small>배틀맵을 흐리게</small></span></div>
+        <div class="thumb none ${cur.src ? "" : "on"}" data-src=""><span class="blank"><i class="fa-solid fa-map"></i>${t("Backdrop.None")}<small>${t("Backdrop.NoneHint")}</small></span></div>
         ${items.map(thumb).join("")}
-        ${items.length ? "" : `<p class="hint empty">${lib.items.length ? "이 폴더는 비어 있습니다. 다른 탭의 그림을 이 탭으로 끌어 오세요." : "아래 '그림 추가'나 '폴더째 가져오기'로 배경을 모아 두세요."}</p>`}
+        ${items.length ? "" : `<p class="hint empty">${lib.items.length ? t("Backdrop.EmptyFolder") : t("Backdrop.EmptyLibrary")}</p>`}
       </div>
       <footer>
-        <label class="dim">어둡게 <input type="range" data-dim min="0" max="0.85" step="0.05" value="${cur.dim}"><output>${Math.round(cur.dim * 100)}%</output></label>
+        <label class="dim">${t("Backdrop.Dim")} <input type="range" data-dim min="0" max="0.85" step="0.05" value="${cur.dim}"><output>${Math.round(cur.dim * 100)}%</output></label>
         <span class="grow"></span>
-        <button type="button" data-act="add"><i class="fa-solid fa-plus"></i> 그림 추가</button>
-        <button type="button" data-act="import"><i class="fa-solid fa-folder-open"></i> 폴더째 가져오기</button>
-        <button type="button" data-act="close">닫기</button>
+        <button type="button" data-act="add"><i class="fa-solid fa-plus"></i> ${t("Backdrop.AddPicture")}</button>
+        <button type="button" data-act="import"><i class="fa-solid fa-folder-open"></i> ${t("Backdrop.ImportFolder")}</button>
+        <button type="button" data-act="close">${t("Common.Close")}</button>
       </footer>
-      <p class="hint">누르면 바로 모두의 무대에 깔립니다. RP 모드를 켤 때마다 이 창이 열립니다(설정에서 끌 수 있음).</p>
+      <p class="hint">${t("Backdrop.Hint")}</p>
     </div>`;
   }
 
@@ -205,15 +206,15 @@ export class BackgroundPicker extends AppV2 {
   }
 
   async _onClick(ev) {
-    const t = ev.target;
-    const rm = t.closest("[data-rm]");
+    const target = ev.target;
+    const rm = target.closest("[data-rm]");
     if (rm) {
       const lib = library();
       lib.items = lib.items.filter(i => i.id !== rm.dataset.rm);
       await saveLibrary(lib);
       return this.render();
     }
-    const delFolder = t.closest("[data-del-folder]");
+    const delFolder = target.closest("[data-del-folder]");
     if (delFolder) {
       const lib = library();
       lib.folders = lib.folders.filter(f => f.id !== delFolder.dataset.delFolder);
@@ -222,15 +223,15 @@ export class BackgroundPicker extends AppV2 {
       this.tab = "all";
       return this.render();
     }
-    const tab = t.closest("[data-tab]");
+    const tab = target.closest("[data-tab]");
     if (tab) { this.tab = tab.dataset.tab; return this.render(); }
-    const thumb = t.closest(".thumb");
+    const thumb = target.closest(".thumb");
     if (thumb) {
       const dim = Number(this.element.querySelector("[data-dim]")?.value);
       await setBackdrop(thumb.dataset.src, { dim: Number.isFinite(dim) ? dim : undefined });
       return this.close();
     }
-    const act = t.closest("[data-act]")?.dataset.act;
+    const act = target.closest("[data-act]")?.dataset.act;
     if (act === "close") return this.close();
     if (act === "folder") { this.editing = "new"; return this.render(); }
     if (act === "add") {
@@ -246,11 +247,11 @@ export class BackgroundPicker extends AppV2 {
         const FP = foundry.applications?.apps?.FilePicker?.implementation ?? globalThis.FilePicker;
         let files = [];
         try { files = (await FP.browse(fp?.activeSource ?? "data", path)).files ?? []; }
-        catch (err) { return ui.notifications.warn("그 폴더를 읽지 못했습니다."); }
+        catch (err) { return ui.notifications.warn(t("Backdrop.ReadFailed")); }
         files = files.filter(f => MEDIA_RE.test(f));
-        if (!files.length) return ui.notifications.info("그 폴더에 그림이 없습니다.");
+        if (!files.length) return ui.notifications.info(t("Backdrop.NoPictures"));
         const lib = library();
-        const name = baseName(path.replace(/[\\/]+$/, "")) || "가져온 배경";
+        const name = baseName(path.replace(/[\\/]+$/, "")) || t("Backdrop.ImportedFolder");
         let folder = lib.folders.find(f => f.name === name);
         if (!folder) { folder = { id: id(), name }; lib.folders.push(folder); }
         let added = 0;
@@ -261,7 +262,7 @@ export class BackgroundPicker extends AppV2 {
         }
         await saveLibrary(lib);
         this.tab = folder.id;
-        ui.notifications.info(`배경 ${added}개를 '${name}' 폴더로 가져왔습니다.`);
+        ui.notifications.info(t("Backdrop.Imported", { count: added, name }));
         this.render();
       } });
     }
