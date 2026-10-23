@@ -385,11 +385,18 @@ export function initSpeakers() {
     if (Object.keys(update).length) message.updateSource(update);
   });
 
-  // Alt + click a token: on the bar, and speaking as it.
-  Hooks.on("controlToken", (token, controlled) => {
-    if (!controlled || !game.keyboard?.isModifierActive?.("Alt")) return;
-    addSpeaker(tokenEntry(token), { pin: true });
-  });
+  // Alt + click a token: on the bar, and speaking as it. Caught on the canvas
+  // element before Foundry sees the click, so a system or module that binds
+  // Alt + click to something else (dnd5e worlds target with it) never gets it.
+  globalThis.document.getElementById("board")?.addEventListener("pointerdown", ev => {
+    if (!ev.altKey || ev.button !== 0) return;
+    const token = globalThis.canvas?.tokens?.hover;
+    const entry = tokenEntry(token);
+    if (!entry || !token.visible || barMode() === "off" || !canSpeakAs(game.user.id, entry.actor)) return;
+    ev.stopPropagation();
+    ev.preventDefault();
+    addSpeaker(entry, { pin: true });
+  }, { capture: true });
 
   // Token HUD (right-click a token): a speech button.
   Hooks.on("renderTokenHUD", (hud, html) => {
