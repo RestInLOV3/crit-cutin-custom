@@ -97,6 +97,7 @@ export class Stage {
     this.el = null;
     this.entries = new Map();       // key → { last, typing, typingUntil, lines }
     this.layout = [];
+    this.focus = null;              // key in front
     this.faces = new Map();         // key → { base, temp: { key, until } }
     this.line = null;               // { key, text, at, narration }
     this.timer = 0;
@@ -246,6 +247,7 @@ export class Stage {
     this.entries.set(key, this.entries.get(plain));
     this.entries.delete(plain);
     this.layout = this.layout.map(k => (k === plain ? key : k));
+    if (this.focus === plain) this.focus = key;
     for (const fig of this.figures) {
       if (fig.id === plain) fig.id = key;
       if (fig.target === plain) fig.target = key;
@@ -260,6 +262,7 @@ export class Stage {
     this.entries.clear();
     this.faces.clear();
     this.layout = [];
+    this.focus = null;
     this.line = null;
     for (const fig of this.figures) { clearTimeout(fig.swap); fig.el.remove(); }
     this.figures = [];
@@ -366,8 +369,9 @@ export class Stage {
     if (!this.shown) return;
     const o = opts();
     for (const key of [...this.entries.keys()]) if (!parseKey(key) || !game.actors.get(parseKey(key).actor)) this.entries.delete(key);
-    const { slots, states, waiting, focus } = computeStage(this.layout, this.entries, Date.now(), o);
+    const { slots, states, waiting, focus } = computeStage(this.layout, this.entries, Date.now(), { ...o, focus: this.focus });
     this.layout = slots;
+    this.focus = focus;
     while (this.figures.length < o.slots) this.figures.push(this._figure());
     while (this.figures.length > o.slots) this.figures.pop().el.remove();
     slots.forEach((key, i) => this._updateFigure(this.figures[i], key, states[key], i, o.slots, key && key === focus));

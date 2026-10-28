@@ -39,10 +39,10 @@ function emptyOrder(slots) {
  * @param {(string|null)[]} prev   last layout
  * @param {Map<string,{last:number,typing?:boolean,lines?:number[]}>} entries
  * @param {number} now
- * @param {{slots:number, hold:number, dim:number, leave:number}} opts
+ * @param {{slots:number, hold:number, dim:number, leave:number, focus?:string|null}} opts  focus: last focus
  * @returns {{slots:(string|null)[], states:Object<string,string>, waiting:string[], focus:string|null}}
  */
-export function computeStage(prev, entries, now, { slots = 3, hold = 4000, dim = 30000, leave = 120000 } = {}) {
+export function computeStage(prev, entries, now, { slots = 3, hold = 4000, dim = 30000, leave = 120000, focus: prevFocus = null } = {}) {
   const opts = { hold, dim };
   const state = id => stateOf(entries.get(id), now, opts);
   const isProtected = id => state(id) === "speaking";
@@ -75,8 +75,10 @@ export function computeStage(prev, entries, now, { slots = 3, hold = 4000, dim =
   const states = {};
   for (const id of layout) if (id) states[id] = state(id);
   // In front of everyone: whoever is typing now, else whoever spoke last.
+  // Two typing at once: the one already in front stays there until it stops
+  // (typing pings refresh `last`, so "most recent" would flip back and forth).
   const onStage = layout.filter(Boolean);
   const typing = onStage.filter(id => entries.get(id)?.typing).sort((a, b) => last(b) - last(a));
-  const focus = typing[0] ?? onStage.sort((a, b) => last(b) - last(a))[0] ?? null;
+  const focus = (typing.includes(prevFocus) ? prevFocus : typing[0]) ?? onStage.sort((a, b) => last(b) - last(a))[0] ?? null;
   return { slots: layout, states, waiting, focus };
 }
